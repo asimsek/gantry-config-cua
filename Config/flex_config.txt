@@ -31,6 +31,7 @@ vacuum.module_chuck2_slot1:  14
 vacuum.module_chuck2_slot2:  14
 vacuum.module_chuck2_slot3:  14
 vacuum.module_chuck2_slot4:  14
+vacuum.module_chuck3_slot_all:  1
 vacuum.launchpad:  9
 
 vacuum.rd53a_chuck_1_TL: 4
@@ -78,8 +79,13 @@ graph_motion.edge.home.tool_rack_pos_1_out: True
 graph_motion.edge.tool_rack_pos_1_out.tool_rack_pos_1_in: True
 
 graph_motion.pos.home: {0,0,0}
-graph_motion.pos.tool_rack_pos_1_in: {677.112,18.533,43.047} #2mm before sucking it
-graph_motion.pos.tool_rack_pos_1_out: {677.112,106.640,40.01}
+# graph_motion.pos.tool_rack_pos_1_in: {677.112,18.533,43.047} # DO NOT USE THIS Z NUMBER {678.213940,17.536072,42.485690} # 2mm before sucking it
+# graph_motion.pos.tool_rack_pos_1_in: {677.99,17.793,40.48207} #40.62
+# graph_motion.pos.tool_rack_pos_1_in: {677.99,17.793,40.62} #this worked usually (should work moving forward)
+# graph_motion.pos.tool_rack_pos_1_in: {677.99,17.793,40.7} # second best
+# graph_motion.pos.tool_rack_pos_1_in: {678.213940,17.536072,40.2} ## 40.73 best?
+graph_motion.pos.tool_rack_pos_1_in: {678.437933,17.384062,40.4} ## 40.73 best?
+graph_motion.pos.tool_rack_pos_1_out: {677.99,100.0,37.5}
 graph_motion.pos.hdi_position: {721.430,342.000,61.432001}
 graph_motion.pos.home_safe: {0,450.000,0}
 
@@ -94,6 +100,11 @@ graph_motion.edge.tool_rack_pos_1_out.stagingArea: True
 #====== Geometry Definitions
 #================================================
 
+geometry.TFPX_GHCOPIECE.fid_tr: {8.600,-21.600,0}
+geometry.TFPX_GHCOPIECE.fid_br: {8.600,21.600,0}
+geometry.TFPX_GHCOPIECE.fid_bl: {-8.600,21.600,0}
+geometry.TFPX_GHCOPIECE.fid_tl: {-8.600,-21.600,0}
+
 geometry.TFPX_1X2_MOCKUP.fid_tr: {8.600,-21.600,0}
 geometry.TFPX_1X2_MOCKUP.fid_tl: {-8.600,-21.600,0}
 geometry.TFPX_1X2_MOCKUP.fid_bl: {-8.600,21.600,0}
@@ -101,31 +112,80 @@ geometry.TFPX_1X2_MOCKUP.fid_br: {8.600,21.600,0}
 
 #geometry.PICKER_TOOL.center_offset: {0,0,46.75}
 
-geometry.PICKER_TOOL.center_offset: {0,0,44.5} #larger number  increases separation
-#geometry.PICKER_TOOL.center_offset: {0,0,47.26} #Small Suction Cups
-#geometry.PICKER_TOOL.center_offset: {0,0,54.00} #Medium Suction Cups
-#geometry.PICKER_TOOL.center_offset: {0,0,53.45}  #Large Suction Cups
+#geometry.PICKER_TOOL.center_offset: {0,0,47.62} # vacuum-aid plate added, new setting as of 5/16/2022, CORRECT
+geometry.PICKER_TOOL.center_offset: {0,0,47.72} # TEST, not squishing the suction cups as much as CORRECT setting
+# geometry.PICKER_TOOL.center_offset: {0,0,44.5} #larger number  increases separation # setting as of 5/13/2022
+# geometry.PICKER_TOOL.center_offset: {0,0,44.8} # NEW 5/13/2022 trying new setting to not squish suction cups too much, 45.0 is too big of a number
+# geometry.PICKER_TOOL.center_offset: {0,0,47.26} #Small Suction Cups
+# geometry.PICKER_TOOL.center_offset: {0,0,54.00} #Medium Suction Cups
+# geometry.PICKER_TOOL.center_offset: {0,0,53.45}  #Large Suction Cups
 geometry.PICKER_TOOL.center_to_suction: {0,11.084,0} #center of picker tool to top suction cup
 # The offset between the camera and the
 # center-of-rotation of the gantry head in x-y
 # and the bottom surface of the tool-holder in z
-geometry.tool_holder_offset: {0.482,-102.362,-43.72}
-#geometry.tool_holder_offset: {-0.321,-101.432,-43.72}
+# pending to know if it is right: geometry.tool_holder_offset: {0.482,-102.362,-43.72} #old tool rack potentially unsafe #A
+# geometry.tool_holder_offset: {-0.321,-101.432,-43.72}
+# geometry.tool_holder_offset: {-0.24439975169,-101.491459532,-43.72} (option 1 +)
+# geometry.tool_holder_offset: {-0.39760024831,-101.372540468,-43.72} # (option 2 -)
+# geometry.tool_holder_offset: {0.482,-102.362,-43.72} # A
+# geometry.tool_holder_offset: {0.482,-102.562,-43.72} # A + eyeball correction
+# geometry.tool_holder_offset: {0.482,-102.162,-43.72} # A - eyeball correction
+# geometry.tool_holder_offset: {0.482,-101.962,-43.72} # A -- eyeball correction
+# geometry.tool_holder_offset: {0.482,-101.802,-43.72} # A --- eyeball correction
+# geometry.tool_holder_offset: {0.482,-101.602,-43.72} # A ---- eyeball correction - GOOD DIRECTION
+# geometry.tool_holder_offset: {-0.8,-101.602,-43.72} # INCORRECT, NEED TO FIX X AND FINE-TUNE Y
+
+# geometry.tool_holder_offset: {-0.8,-101.502,-43.72} # INCORRECT, NEED TO FIX X AND FINE-TUNE Y
+# geometry.tool_holder_offset: {-1,-101,-43.72} # VERY INCORRECT
+# geometry.tool_holder_offset: {0,-101.502,-43.72} # *VERY VERY CLOSE*, NEED TO FIX X AND FINE-TUNE Y *BASELINE*
+geometry.tool_holder_offset: {-0.3,-101.502,-43.72} # *VERY VERY CLOSE*, NEED TO FIX X AND FINE-TUNE Y - possible improvement over baseline
+
+# geometry.tool_holder_offset: {-1,-101.402,-43.72} # INCORRECT, NEED TO FIX X AND FINE-TUNE Y - try this
+# geometry.tool_holder_offset: {-3.8,-98.002,-43.72} # INCORRECT
+# geometry.tool_holder_offset: {0.49784515333,-102.441517218,-43.72} ##(0.01584515333,-0.07951721761,0) (B = A + correction)
+# geometry.tool_holder_offset: {0.49459464414,-102.479460058,-43.72}  ##(-0.00325050919,-0.0379428403,0) (C = B + correction)
+# geometry.tool_holder_offset: {0.48718925332,-102.562127442,-43.72}  ##(-0.00740539082,-0.0826673837,0) (D = C + correction) # CORRECT GHCO!!!!
+# geometry.tool_holder_offset: {1.28667651963,-102.825447511,-43.72}  ##(0.79948726631,-0.26332006902,0) (E = D + correction) # WRONG
+# geometry.tool_holder_offset: {1.30860451722,-102.812956913,-43.72}  ##(0.8214152639,-0.25082947055,0) (E = D + correction) # WRONG
+
+
+
+# geometry.tool_holder_offset: {0.48718925332,-105.562127442,-43.72}
 
 geometry.TFPX_QUARTERGLASS.fid_tr:{5.930,-10.022,0}
 geometry.TFPX_QUARTERGLASS.fid_br:{5.930,10.022,0}
 geometry.TFPX_QUARTERGLASS.fid_bl:{-5.930,10.022,0}
 geometry.TFPX_QUARTERGLASS.fid_tl:{-5.930,-10.022,0}
+geometry.TFPX_QUARTERGLASS.thickness: 0.470
 
-geometry.TFPX_RD53ASENSORROC.fid_tr: {12.0,-20.5,0}
-geometry.TFPX_RD53ASENSORROC.fid_br: {12.0,20.5,0}
-geometry.TFPX_RD53ASENSORROC.fid_bl: {-12.0,20.5,0}
-geometry.TFPX_RD53ASENSORROC.fid_tl: {-12.0,-20.5,0}
+# 05/19/2022
+# geometry.TFPX_RD53AROC.fid_br:
+# geometry.TFPX_RD53AROC.thickness:
+geometry.TFPX_RD53AROC.fid_tr: {5.930,-10.022,0}
+geometry.TFPX_RD53AROC.fid_br: {5.930,10.022,0}
+geometry.TFPX_RD53AROC.fid_bl: {-5.930,10.022,0}
+geometry.TFPX_RD53AROC.fid_tl: {-5.930,-10.022,0}
+geometry.TFPX_RD53AROC.thickness: 0.755
 
+geometry.TFPX_RD53AQUARTERROC.fid_tr: {5.7635,-10.025,0}
+geometry.TFPX_RD53AQUARTERROC.fid_br: {5.7635,10.025,0}
+geometry.TFPX_RD53AQUARTERROC.fid_bl: {-5.7635,10.025,0}
+geometry.TFPX_RD53AQUARTERROC.fid_tl: {-5.7635,-10.025,0}
+geometry.TFPX_RD53AQUARTERROC.thickness: 0.505
+
+geometry.TFPX_SINGLEGLASS.fid_tr: {12.0,-20.5,0}
+geometry.TFPX_SINGLEGLASS.fid_br: {12.0,20.5,0}
+geometry.TFPX_SINGLEGLASS.fid_bl: {-12.0,20.5,0}
+geometry.TFPX_SINGLEGLASS.fid_tl: {-12.0,-20.5,0}
+
+#glass slide dimensions
 geometry.TFPX_RD53AHDI.fid_tr: {9.841,-19.8415,0}
 geometry.TFPX_RD53AHDI.fid_br: {9.841,19.8415,0}
 geometry.TFPX_RD53AHDI.fid_bl: {-9.841,19.8415,0}
 geometry.TFPX_RD53AHDI.fid_tl: {-9.841,-19.8415,0}
+geometry.TFPX_RD53AHDI.thickness: 0.241
+geometry.TFPX_RD53AHDI.dim_bondHDI: {9.843,19.711,0}  #(width,length) # Dimensions of the HDI Bond Pads
+geometry.TFPX_RD53AHDI.len_bondpad_HDI: 0.77
 
 geometry.TFPX_RD53AGLASSDIM: {20.044,11.859, 0} #(length, width)
 
@@ -216,6 +276,12 @@ siteGeometry.pos_BRsenRoc_launch_tr: {735.397710,232.320420,62.521772}
 siteGeometry.pos_BLsenRoc_launch_tr: {723.571069,232.210150,62.521771}
 siteGeometry.pos_TLsenRoc_launch_tr: {723.507602,212.044947,62.396772}
 
+#Positions of the Top Right corners of the 4 rd53a red sensors on Launch
+#measure them now
+siteGeometry.pos_TR_ROC_launch2_tr: {735.351397,212.149743,62.521772}
+siteGeometry.pos_BR_ROC_launch2_tr: {735.397710,232.320420,62.521772}
+siteGeometry.pos_BL_ROC_launch2_tr: {723.571069,232.210150,62.521771}
+siteGeometry.pos_TL_ROC_launch2_tr: {723.507602,212.044947,62.396772}
 #HDI pick and place translation vector and rotation angle
 siteGeometry.v_hdi_translation: {-50.16,0.08749,-7.266}
 siteGeometry.rot_hdi_translation: -0.02222
@@ -224,3 +290,12 @@ siteGeometry.rot_hdi_translation: -0.02222
 siteGeometry.v_senRoc_error: {0.,0.,0.}#{-0.003,0.007,0}
 siteGeometry.rot_senRoc_error: 0.      #-0.007
 
+siteGeometry.v_ROC_error:{0.,0.,0.}
+siteGeometry.rot_ROC_error: 0.
+
+# Fine correction for the ROCs to align bond pads with HDI bond pads
+### DO NOT GO BELOW 0.03 mm ###
+siteGeometry.delta_tr: {-0.035,0.070,0} # {length > 0.03,width > 0.03}
+siteGeometry.delta_br: {0.155,0.05,0} # {length > 0.03,width > 0.03}
+siteGeometry.delta_bl: {0.143,0.07,0} # {length > 0.03,width > 0.03}
+siteGeometry.delta_tl: {-0.023,0.050,0} # {length > 0.03,width > 0.03}
