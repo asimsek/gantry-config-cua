@@ -1,11 +1,10 @@
 #================================================
 #====== Hardware configuration
 #================================================
-
 camera.gantryhead.CameraGroup: 1
-camera.gantryhead.VendorName: UI148xSE-M_4002830874
-camera.gantryhead.SerialNumberHigh: 0x10FE58
-camera.gantryhead.SerialNumberLow: 0x26A865CD
+camera.gantryhead.driver: ueye
+camera.gantryhead.serial_number: "4002830874"
+
 
 # ONLY X {1.087997,0.001079,0.000000}
 camera.gantryhead.FOV-x: 1.087997
@@ -15,31 +14,71 @@ camera.gantryhead.FOV-y: 0.820658
 light.gantryhead.control: manual
 light.gantryhead.hardware_address: Y.0
 
+# dispenser.hardware_address: cDAQ1Mod6/port0/line30
 
 #================================================
 
-dispenser.hardware_address: cDAQ1Mod6/port0/line30
 
 # Vacuum line16 is unknown (so far)
-vacuum.gantry_head_outer:    2
-vacuum.gantry_head_inner:    0
-vacuum.module_chuck4_slot1:  3
-vacuum.module_chuck4_slot2:  5
-vacuum.module_chuck4_slot3:  7
-vacuum.module_chuck4_slot4:  9
-vacuum.module_chuck2_slot1:  14
-vacuum.module_chuck2_slot2:  14
-vacuum.module_chuck2_slot3:  14
-vacuum.module_chuck2_slot4:  14
-vacuum.module_chuck3_slot_all:  1
-vacuum.launchpad:  9
+vacuum.gantry_head_outer:    0
+vacuum.gantry_head_inner:    2
+vacuum.gelpak_release: 30
+
+##################################
+#vacuum.module_chuck4_slot1:  3
+#vacuum.module_chuck4_slot2:  5
+#vacuum.module_chuck4_slot3:  7
+#vacuum.module_chuck4_slot4:  9
+#vacuum.module_chuck2_slot1:  14
+#vacuum.module_chuck2_slot2:  14
+#vacuum.module_chuck2_slot3:  14
+#vacuum.module_chuck2_slot4:  14
+#vacuum.module_chuck3_slot_all:  1
+#vacuum.launchpad:  9
+##################################
+
+########### CROC 1x2 ###########
+vacuum.croc_chuck_1_top: 13
+vacuum.croc_chuck_0_top: 13
+vacuum.croc_chuck_1_bot: 14
+vacuum.croc_chuck_0_bot: 14
+vacuum.croc_chuck_2_top: 5
+
+vacuum.croc_launchROC_top: 5
+vacuum.croc_chuck_2_bot: 9
+vacuum.croc_launchROC_bot: 9
+vacuum.croc_chuck_3: 15
+vacuum.croc_launchHDI: 15
+vacuum.croc_hdipicker: 7
+vacuum.croc_weight_0: 7
+vacuum.croc2x2_weight_0: 27
+
+########### CROC 2x2 ###########
+vacuum.croc2x2_launchHDI: 10
+vacuum.croc2x2_launchROC_tr: 4
+vacuum.croc2x2_launchROC_br: 8
+vacuum.croc2x2_launchROC_bl: 3
+vacuum.croc2x2_launchROC_tl: 26
+vacuum.croc2x2_chuck_0_tr: 28
+vacuum.croc2x2_chuck_0_br: 6
+vacuum.croc2x2_chuck_0_bl: 11
+vacuum.croc2x2_chuck_0_tl: 12
+vacuum.croc2x2_chuck_1: 21
+vacuum.croc2x2_chuck_2: 20
+vacuum.croc2x2_chuck_3: 18
+vacuum.croc2x2_chuck_4: 19 #RELABEL
+vacuum.croc2x2_chuck_0: 19 #RELABEL
+
+#### From Purdue
+# vacuum.module_chuck_0_slot_1: 24
+# vacuum.module_chuck_0_slot_2: 18
 
 vacuum.rd53a_chuck_1_TL: 4
 vacuum.rd53a_chuck_1_TR: 6
 vacuum.rd53a_chuck_1_BL: 12
 vacuum.rd53a_chuck_1_BR: 11
 vacuum.rd53a_chuck_2: 8
-vacuum.rd53a_chuck_3: 10
+# vacuum.rd53a_chuck_3: 10  # REMOVE; Used to be part of RD53A setup
 
 # Purdue Mechanics vacuum
 vacuum.purdue_mechanics_left: 15
@@ -64,35 +103,26 @@ manifold.port.13: cDAQ1Mod6/port0/line13
 manifold.port.14: cDAQ1Mod6/port0/line14
 manifold.port.15: cDAQ1Mod6/port0/line15
 manifold.port.16: cDAQ1Mod6/port0/line16
-
-#tool_rack.0: None
-tool_rack.1: picker_tool
-#tool_rack.2: None
-
-# must be 2mm above tool in z
-graph_motion.edge.home_safe.middle_tool_rack_out: True
-graph_motion.edge.middle_tool_rack_out.middle_tool_rack_up: True
-graph_motion.edge.middle_tool_rack_up.middle_tool_rack: True
-graph_motion.edge.middle_tool_rack_out.hdi_position: True
-graph_motion.edge.home.home_safe: True
-graph_motion.edge.home.tool_rack_pos_1_out: True
-graph_motion.edge.tool_rack_pos_1_out.tool_rack_pos_1_in: True
-
-graph_motion.pos.home: {0,0,0}
-# graph_motion.pos.tool_rack_pos_1_in: {677.112,18.533,43.047} # DO NOT USE THIS Z NUMBER {678.213940,17.536072,42.485690} # 2mm before sucking it
-# graph_motion.pos.tool_rack_pos_1_in: {677.99,17.793,40.48207} #40.62
-# graph_motion.pos.tool_rack_pos_1_in: {677.99,17.793,40.62} #this worked usually (should work moving forward)
-# graph_motion.pos.tool_rack_pos_1_in: {677.99,17.793,40.7} # second best
-# graph_motion.pos.tool_rack_pos_1_in: {678.213940,17.536072,40.2} ## 40.73 best?
-graph_motion.pos.tool_rack_pos_1_in: {678.437933,17.384062,40.4} ## 40.73 best?
-graph_motion.pos.tool_rack_pos_1_out: {677.99,100.0,37.5}
-graph_motion.pos.hdi_position: {721.430,342.000,61.432001}
-graph_motion.pos.home_safe: {0,450.000,0}
+manifold.port.17: cDAQ1Mod6/port0/line17
+manifold.port.18: cDAQ1Mod6/port0/line18
+manifold.port.19: cDAQ1Mod6/port0/line19
+manifold.port.20: cDAQ1Mod6/port0/line20
+manifold.port.21: cDAQ1Mod6/port0/line21
+manifold.port.22: cDAQ1Mod6/port0/line22
+manifold.port.23: cDAQ1Mod6/port0/line23
+manifold.port.24: cDAQ1Mod6/port0/line24
+manifold.port.25: cDAQ1Mod6/port0/line25
+manifold.port.26: cDAQ1Mod6/port0/line26
+manifold.port.27: cDAQ1Mod6/port0/line27
+manifold.port.28: cDAQ1Mod6/port0/line28
+manifold.port.29: cDAQ1Mod6/port0/line29
+manifold.port.30: cDAQ1Mod6/port0/line30
+manifold.port.31: cDAQ1Mod6/port0/line31
 
 
-graph_motion.pos.safeUnload: {190,90,0}
-graph_motion.pos.stagingArea: {590,337,0}
-graph_motion.edge.tool_rack_pos_1_out.stagingArea: True
+tool_rack.0: None
+tool_rack.1: None
+tool_rack.2: picker_tool
 
 
 
@@ -100,57 +130,15 @@ graph_motion.edge.tool_rack_pos_1_out.stagingArea: True
 #====== Geometry Definitions
 #================================================
 
-geometry.TFPX_GHCOPIECE.fid_tr: {8.600,-21.600,0}
-geometry.TFPX_GHCOPIECE.fid_br: {8.600,21.600,0}
-geometry.TFPX_GHCOPIECE.fid_bl: {-8.600,21.600,0}
-geometry.TFPX_GHCOPIECE.fid_tl: {-8.600,-21.600,0}
-
 geometry.TFPX_1X2_MOCKUP.fid_tr: {8.600,-21.600,0}
 geometry.TFPX_1X2_MOCKUP.fid_tl: {-8.600,-21.600,0}
 geometry.TFPX_1X2_MOCKUP.fid_bl: {-8.600,21.600,0}
 geometry.TFPX_1X2_MOCKUP.fid_br: {8.600,21.600,0}
 
-#geometry.PICKER_TOOL.center_offset: {0,0,46.75}
-
-#geometry.PICKER_TOOL.center_offset: {0,0,47.62} # vacuum-aid plate added, new setting as of 5/16/2022, CORRECT
-geometry.PICKER_TOOL.center_offset: {0,0,47.72} # TEST, not squishing the suction cups as much as CORRECT setting
-# geometry.PICKER_TOOL.center_offset: {0,0,44.5} #larger number  increases separation # setting as of 5/13/2022
-# geometry.PICKER_TOOL.center_offset: {0,0,44.8} # NEW 5/13/2022 trying new setting to not squish suction cups too much, 45.0 is too big of a number
-# geometry.PICKER_TOOL.center_offset: {0,0,47.26} #Small Suction Cups
-# geometry.PICKER_TOOL.center_offset: {0,0,54.00} #Medium Suction Cups
-# geometry.PICKER_TOOL.center_offset: {0,0,53.45}  #Large Suction Cups
-geometry.PICKER_TOOL.center_to_suction: {0,11.084,0} #center of picker tool to top suction cup
-# The offset between the camera and the
-# center-of-rotation of the gantry head in x-y
-# and the bottom surface of the tool-holder in z
-# pending to know if it is right: geometry.tool_holder_offset: {0.482,-102.362,-43.72} #old tool rack potentially unsafe #A
-# geometry.tool_holder_offset: {-0.321,-101.432,-43.72}
-# geometry.tool_holder_offset: {-0.24439975169,-101.491459532,-43.72} (option 1 +)
-# geometry.tool_holder_offset: {-0.39760024831,-101.372540468,-43.72} # (option 2 -)
-# geometry.tool_holder_offset: {0.482,-102.362,-43.72} # A
-# geometry.tool_holder_offset: {0.482,-102.562,-43.72} # A + eyeball correction
-# geometry.tool_holder_offset: {0.482,-102.162,-43.72} # A - eyeball correction
-# geometry.tool_holder_offset: {0.482,-101.962,-43.72} # A -- eyeball correction
-# geometry.tool_holder_offset: {0.482,-101.802,-43.72} # A --- eyeball correction
-# geometry.tool_holder_offset: {0.482,-101.602,-43.72} # A ---- eyeball correction - GOOD DIRECTION
-# geometry.tool_holder_offset: {-0.8,-101.602,-43.72} # INCORRECT, NEED TO FIX X AND FINE-TUNE Y
-
-# geometry.tool_holder_offset: {-0.8,-101.502,-43.72} # INCORRECT, NEED TO FIX X AND FINE-TUNE Y
-# geometry.tool_holder_offset: {-1,-101,-43.72} # VERY INCORRECT
-# geometry.tool_holder_offset: {0,-101.502,-43.72} # *VERY VERY CLOSE*, NEED TO FIX X AND FINE-TUNE Y *BASELINE*
-geometry.tool_holder_offset: {-0.3,-101.502,-43.72} # *VERY VERY CLOSE*, NEED TO FIX X AND FINE-TUNE Y - possible improvement over baseline
-
-# geometry.tool_holder_offset: {-1,-101.402,-43.72} # INCORRECT, NEED TO FIX X AND FINE-TUNE Y - try this
-# geometry.tool_holder_offset: {-3.8,-98.002,-43.72} # INCORRECT
-# geometry.tool_holder_offset: {0.49784515333,-102.441517218,-43.72} ##(0.01584515333,-0.07951721761,0) (B = A + correction)
-# geometry.tool_holder_offset: {0.49459464414,-102.479460058,-43.72}  ##(-0.00325050919,-0.0379428403,0) (C = B + correction)
-# geometry.tool_holder_offset: {0.48718925332,-102.562127442,-43.72}  ##(-0.00740539082,-0.0826673837,0) (D = C + correction) # CORRECT GHCO!!!!
-# geometry.tool_holder_offset: {1.28667651963,-102.825447511,-43.72}  ##(0.79948726631,-0.26332006902,0) (E = D + correction) # WRONG
-# geometry.tool_holder_offset: {1.30860451722,-102.812956913,-43.72}  ##(0.8214152639,-0.25082947055,0) (E = D + correction) # WRONG
-
-
-
-# geometry.tool_holder_offset: {0.48718925332,-105.562127442,-43.72}
+geometry.TFPX_SINGLEGLASS.fid_tr: {12.0,-20.5,0}
+geometry.TFPX_SINGLEGLASS.fid_br: {12.0,20.5,0}
+geometry.TFPX_SINGLEGLASS.fid_bl: {-12.0,20.5,0}
+geometry.TFPX_SINGLEGLASS.fid_tl: {-12.0,-20.5,0}
 
 geometry.TFPX_QUARTERGLASS.fid_tr:{5.930,-10.022,0}
 geometry.TFPX_QUARTERGLASS.fid_br:{5.930,10.022,0}
@@ -158,14 +146,19 @@ geometry.TFPX_QUARTERGLASS.fid_bl:{-5.930,10.022,0}
 geometry.TFPX_QUARTERGLASS.fid_tl:{-5.930,-10.022,0}
 geometry.TFPX_QUARTERGLASS.thickness: 0.470
 
-# 05/19/2022
-# geometry.TFPX_RD53AROC.fid_br:
-# geometry.TFPX_RD53AROC.thickness:
+geometry.TFPX_RD53AQUARTERROC.fid_tr: {5.7635,-10.025,0}
+geometry.TFPX_RD53AQUARTERROC.fid_br: {5.7635,10.025,0}
+geometry.TFPX_RD53AQUARTERROC.fid_bl: {-5.7635,10.025,0}
+geometry.TFPX_RD53AQUARTERROC.fid_tl: {-5.7635,-10.025,0}
+geometry.TFPX_RD53AQUARTERROC.thickness: 0.505
+
+
 geometry.TFPX_RD53AROC.fid_tr: {5.930,-10.022,0}
 geometry.TFPX_RD53AROC.fid_br: {5.930,10.022,0}
 geometry.TFPX_RD53AROC.fid_bl: {-5.930,10.022,0}
 geometry.TFPX_RD53AROC.fid_tl: {-5.930,-10.022,0}
 geometry.TFPX_RD53AROC.thickness: 0.755
+
 
 geometry.TFPX_RD53AQUARTERROC.fid_tr: {5.7635,-10.025,0}
 geometry.TFPX_RD53AQUARTERROC.fid_br: {5.7635,10.025,0}
@@ -173,12 +166,7 @@ geometry.TFPX_RD53AQUARTERROC.fid_bl: {-5.7635,10.025,0}
 geometry.TFPX_RD53AQUARTERROC.fid_tl: {-5.7635,-10.025,0}
 geometry.TFPX_RD53AQUARTERROC.thickness: 0.505
 
-geometry.TFPX_SINGLEGLASS.fid_tr: {12.0,-20.5,0}
-geometry.TFPX_SINGLEGLASS.fid_br: {12.0,20.5,0}
-geometry.TFPX_SINGLEGLASS.fid_bl: {-12.0,20.5,0}
-geometry.TFPX_SINGLEGLASS.fid_tl: {-12.0,-20.5,0}
 
-#glass slide dimensions
 geometry.TFPX_RD53AHDI.fid_tr: {9.841,-19.8415,0}
 geometry.TFPX_RD53AHDI.fid_br: {9.841,19.8415,0}
 geometry.TFPX_RD53AHDI.fid_bl: {-9.841,19.8415,0}
@@ -187,15 +175,247 @@ geometry.TFPX_RD53AHDI.thickness: 0.241
 geometry.TFPX_RD53AHDI.dim_bondHDI: {9.843,19.711,0}  #(width,length) # Dimensions of the HDI Bond Pads
 geometry.TFPX_RD53AHDI.len_bondpad_HDI: 0.77
 
-geometry.TFPX_RD53AGLASSDIM: {20.044,11.859, 0} #(length, width)
 
-#Z correction for the surveillence from purdue
-siteGeometry.correctForZ: -0.542
+geometry.TFPX_CROC_MULTIGLASS.fid_tr: {9.214,-10.328,0}
+geometry.TFPX_CROC_MULTIGLASS.fid_br: {9.214,10.328,0}
+geometry.TFPX_CROC_MULTIGLASS.fid_bl: {-9.214,10.328,0}
+geometry.TFPX_CROC_MULTIGLASS.fid_tl: {-9.214,-10.328,0}
+geometry.TFPX_CROC_MULTIGLASS.thickness: 0.513
+geometry.TFPX_CROC_SINGLEGLASS.thickness: 0.500
+
+geometry.TFPX_CROC_HDI.thickness: 0.290
+
+#geometry.TFPX_CROC_DUALROC.thickness: 0.485
+geometry.TFPX_CROC_DUALROC.thickness: 0.808
+geometry.dist_dualHDI_bondpads: 21.216 #mm
+geometry.dist_dualROC_bondpads: 21.064 #mm
+
+geometry.TFPX_CROC2X2_HDI.thickness: 0.140
+geometry.TFPX_CROC2X2_QUADROC.thickness: 0.808 
+geometry.dist_quadHDI_bondpads: 0.27 #REMEASURE
+geometry.dist_quadROC_bondpads: 21.064 #REMEASURE
+
+geometry.TFPX_CROC2X2_HDI.fid_tr: {16.703,-21.592,0}
+geometry.TFPX_CROC2X2_HDI.fid_br: {16.703,21.592,0}
+geometry.TFPX_CROC2X2_HDI.fid_bl: {-16.703,21.592,0}
+geometry.TFPX_CROC2X2_HDI.fid_tl: {-16.703,-21.592,0}
+
+geometry.TFPX_CROC2X2_QUADROC.fid_tr: {9.304,-10.820,0}
+geometry.TFPX_CROC2X2_QUADROC.fid_br: {9.304,10.820,0}
+geometry.TFPX_CROC2X2_QUADROC.fid_bl: {-9.304,10.820,0}
+geometry.TFPX_CROC2X2_QUADROC.fid_tl: {-9.304,-10.820,0}
+
+geometry.TFPX_CROC2X2_QUADSENSORROC.fid_tr: {18.795,-22.265,0} #REMEASURE
+geometry.TFPX_CROC2X2_QUADSENSORROC.fid_br: {18.795,22.265,0} #REMEASURE
+geometry.TFPX_CROC2X2_QUADSENSORROC.fid_bl: {-18.795,22.265,0} #REMEASURE
+geometry.TFPX_CROC2X2_QUADSENSORROC.fid_tl: {-18.795,-22.265,0} #REMEASURE
+
+geometry.TFPX_CROC2X2_QUADTHERMALROC.fid_tr: {19.025, -20.784,0}
+geometry.TFPX_CROC2X2_QUADTHERMALROC.fid_br: {19.025, 20.784,0}
+geometry.TFPX_CROC2X2_QUADTHERMALROC.fid_bl: {-19.025, 20.784,0}
+geometry.TFPX_CROC2X2_QUADTHERMALROC.fid_tl: {-19.025, -20.784,0}
+
+geometry.TFPX_CROC_SENSORROC.thickness: 0.392 # for HPK
+geometry.TFPX_CROC_SENSOR.thickness: 0.225    # for HPK
+geometry.dist_CROC_HDI_bondpads: 42.949
+geometry.dist_sensorROC_bondpads: 43.051
+
+geometry.TFPX_GHCOPIECE.fid_tr: {8.600,-21.600,0}
+geometry.TFPX_GHCOPIECE.fid_br: {8.600,21.600,0}
+geometry.TFPX_GHCOPIECE.fid_bl: {-8.600,21.600,0}
+geometry.TFPX_GHCOPIECE.fid_tl: {-8.600,-21.600,0}
+
+
+geometry.PICKER_TOOL.center_offset: {0,0,47.72} # 
+# geometry.PICKER_TOOL.center_to_suction: {0,11.084,0} # 
+
+
+# The offset between the camera and the
+# center-of-rotation of the gantry head in x-y
+# and the bottom surface of the tool-holder in z
+# geometry.tool_holder_offset: {-0.3164824463,-102.2873920141,-17.0} # REFERENCE POINT
+# geometry.tool_holder_offset: {-0.3079674542,-102.2929647457,-17.2} # REFERENCE POINT # x=-679.41 µm | y=-83.76 µm
+# geometry.tool_holder_offset: {0.3714394647,-102.2092046759,-17.20} # x=7.74 µm | y=-5.02 µm
+# geometry.tool_holder_offset: {0.3636974767,-102.2041819747,-17.20} #  x=3.16 µm | y=3.67 µm
+geometry.tool_holder_offset: {0.3605405310,-102.2078507414,-17.20}   # x=3.18 µm | y=2.92 µm
+
+
+
+#================================================
+#====== Site Geometry Definitions
+#================================================
+# These are geometrical parameters, like the positions of chucks, specific to a site
+
+# Positions of HDI on Chuck 2
+siteGeometry.pos_chuck2_tr: {612.143465,529.377516,69.344708} 
+siteGeometry.pos_chuck2_br: {612.156320,569.120231,69.280407} 
+siteGeometry.pos_chuck2_bl: {592.453977,569.132485,69.080363} 
+siteGeometry.pos_chuck2_tl: {592.426167,529.389889,69.325281}
+
+# Positions of senRoc on Launch 1
+siteGeometry.pos_senRoc_launch_tr: {735.333300,212.502835,62.521772}
+siteGeometry.pos_senRoc_launch_br: {735.274014,253.590323,62.521772}
+siteGeometry.pos_senRoc_launch_bl: {711.662899,253.547910,62.521772}
+siteGeometry.pos_senRoc_launch_tl: {711.725926,212.454066,62.521772} 
+
+
+# Top Right corner of the Single ROC on Launchpad 1
+# siteGeometry.pos_ROC_launch1_tr: {572.701,199.509,88.022}
+# siteGeometry.pos_SensorROC_launch1_tr: {572.800,200.308,88.257}
+
+siteGeometry.pos_TR_ROC_launch2_tr: {676.055979,212.550486,62.766775}
+siteGeometry.pos_BR_ROC_launch2_tr: {676.139264,232.572839,62.766774}
+siteGeometry.pos_BL_ROC_launch2_tr: {664.648121,232.614179,62.726772}
+siteGeometry.pos_TL_ROC_launch2_tr: {664.558499,212.602363,62.686775}
+
+siteGeometry.pos_TRsenRoc_launch_tr: {735.351397,212.149743,62.521772}
+siteGeometry.pos_BRsenRoc_launch_tr: {735.397710,232.320420,62.521772}
+siteGeometry.pos_BLsenRoc_launch_tr: {723.571069,232.210150,62.521771}
+siteGeometry.pos_TLsenRoc_launch_tr: {723.507602,212.044947,62.369772}
+
+###Information for the CROC HDI
+siteGeometry.pos_croc_hdi_top1: {314.793280,529.087327,93.910001}
+siteGeometry.pos_croc_hdi_top2: {314.842789,550.753913,93.919998}
+siteGeometry.dist_hdi_bondpads: 43.080 #mm
+siteGeometry.dist_hdi_half_bondpads: 16.803 #mm
+
+# CROC HDI pick and place translation vector and rotation angle
+## siteGeometry.croc_v_translation: {-100.3455445,-0.041407833,-6.4854225} ## GOOD 30um
+## siteGeometry.croc_rot_translation:-0.184506167 ## GOOD 14um
+
+
+### Information for the CROC Single Glass Script
+siteGeometry.pos_croc_singleGlass_top1: {262.491543,528.456737,68.702000}
+siteGeometry.dist_singleGlass_bondpads: 41.503 #mm
+
+# Vector from center of the bond pads to the center of the Single Glass Piece (at rot = 0)
+siteGeometry.singleGlass_bondsToCenter: {9.3372,-0.0036,0} 
+
+
+### Information for the CROC Multi Glass Script
+# siteGeometry.pos_croc_TOPGlass_top1: {111.517,523.762,99.772}
+# siteGeometry.pos_croc_BOTGlass_top1: {111.064,552.390,99.737}
+# siteGeometry.dist_multiGlass_bondpads: 19.698 #mm
+
+
+### Information for the CROC Dual ROC Script
+siteGeometry.pos_croc_TOPROC_top1: {262.954794,527.866309,93.365004}
+siteGeometry.pos_croc_BOTROC_top1: {263.006478,550.606571,93.375018}
+siteGeometry.delta_TOPROC: {0.0,0,0}
+siteGeometry.delta_BOTROC: {0.15,0,0}
+
+
+# CROC HDI pick and place translation vector and rotation angle
+# Station 0
+siteGeometry.croc_v_translation_STAT_0: {-100.320443,-0.055543,-6.485292}
+siteGeometry.croc_rot_translation_STAT_0: -0.164323
+
+# Vector from center of the bond pads on one Dual ROC to its center
+siteGeometry.dualROC_bondsToCenter: {11.828,0,0}
+
+
+### Information for the CROC Sensor ROC Script
+siteGeometry.pos_croc_SensorROC_top1: {262.893679,528.199234,94.045004}
+siteGeometry.delta_SEN_CROC: {0.06,0,0}
+
+# Vector from center of the bond pads on the Sensor ROC to its center
+siteGeometry.sensorROC_bondsToCenter: {9.708646,0,0} # {10.098646,0,0}
+
+
+# HDI pick and place translation vector and rotation angle
+siteGeometry.v_hdi_translation: {-50.1512,-0.3384,-7.5064} #fit
+siteGeometry.rot_hdi_translation: -0.1389
+
+
+# SensorROC translation correctional terms
+siteGeometry.v_senRoc_error: {0.,0.,0.}#{-0.003,0.007,0}
+siteGeometry.rot_senRoc_error: 0.      #-0.007
+
+# ROC translation Correctional Terms (after statistical study):
+siteGeometry.v_ROC_error:{0.,0.,0.}
+siteGeometry.rot_ROC_error: 0.
+
+
+### QuadROC Information
+
+# HDI position data
+siteGeometry.pos_croc2x2_hdi_TR: {657.891458,523.561447,93.825476}
+siteGeometry.pos_final_croc2x2_hdi_tr: {507.855616,523.426771,87.375407}
+
+ # QuadROC position data
+siteGeometry.pos_croc2x2LaunchROC_TR: {584.756188,522.083479,93.201025}
+siteGeometry.pos_croc2x2LaunchROC_BR: {584.828988,543.828198,93.201044}
+siteGeometry.pos_croc2x2LaunchROC_BL: {566.075420,543.886810,93.201100}
+siteGeometry.pos_croc2x2LaunchROC_TL: {565.982649,522.120571,93.201077}
+
+ # Vector from midpoint of bondpad edge to 
+siteGeometry.quadROC_bondsToCenter: {9.228,0,0}
+
+ # Station 0 data
+siteGeometry.pos_croc2x2_translation_STAT_0: {-149.9292,-0.0164,-6.458} # FINAL Aug 01, 2023
+siteGeometry.rot_croc2x2_translation_STAT_0: -0.0500 # FINAL Aug 01, 2023
+
+### Quad Sensor ROC Information
+
+ # HDI position data
+
+ # Station 1 data
+siteGeometry.croc2x2_v_translation_STAT_1: {-150.750,-150.769,-6.338} #REMEASURE
+siteGeometry.croc2x2_rot_translation_STAT_1: 0 #REMEASURE
+
+ # Station 2 data
+siteGeometry.croc2x2_v_translation_STAT_2: {-75.965,-150.760,-6.283} #REMEASURE
+siteGeometry.croc2x2_rot_translation_STAT_2: 0 #REMEASURE
+
+ # Station 3 data
+siteGeometry.croc2x2_v_translation_STAT_3: {-1.436,-150.760,-6.063} #REMEASURE
+siteGeometry.croc2x2_rot_translation_STAT_3: 0 #REMEASURE
+
+ # Station 4 data
+siteGeometry.croc2x2_v_translation_STAT_4: {74.254,-148.955,-6.079} #REMEASURE
+siteGeometry.croc2x2_rot_translation_STAT_4: 0 #REMEASURE
+
+ # Fine Correction for the Quad ROC Script
+siteGeometry.delta_croc2x2_tr: {0.0530,0.1,0}
+siteGeometry.delta_croc2x2_br: {0.1850,0.1,0}
+siteGeometry.delta_croc2x2_bl: {0.0200,0.1,0}
+siteGeometry.delta_croc2x2_tl: {0.2095,0.1,0}
+
+ # Fine Correction for the Quad Sensor ROC Script
+siteGeometry.delta_QUADSENSORROC: {0,0,0}
+
+ # Fine correction for the ROCs to align bond pads with HDI bond pads
+siteGeometry.delta_ROC: {0,0,0} # {width, length, 0}
+siteGeometry.delta_SensorROC: {0,0.0825,0} # {width, length, 0}
+
+
+#Fine correction for the CROC thermal mockup
+siteGeometry.delta_singleGlass: {0.0,0.0,0.0}
+siteGeometry.delta_TOPGlass: {0.0,0.0,0.0}
+siteGeometry.delta_BOTGlass: {0.0,0.0,0.0}
+
+
+# Fine correction for the ROCs to align bond pads with HDI bond pads
+### DO NOT GO BELOW 0.03 mm ###
+siteGeometry.delta_tr: {-0.035,0.070,0} # {length > 0.03,width > 0.03}
+siteGeometry.delta_br: {0.155,0.05,0} # {length > 0.03,width > 0.03}
+siteGeometry.delta_bl: {0.143,0.07,0} # {length > 0.03,width > 0.03}
+siteGeometry.delta_tl: {-0.023,0.050,0} # {length > 0.03,width > 0.03}
+
+
+# Fine correction for the 1x2 Thermal Mockups to align with the HDI
+### DO NOT CHANGE - NOT TESTED YET ###
+#siteGeometry.delta_1x2t_top: {2,0,0}
+
+
+
 #================================================
 #====== Vision/Pattern Recognition parameters
 #================================================
 
 vision.debug_enable: True
+vision.autofocus.step_size: 0.02 # mm
+vision.autofocus.delay: 300 # ms
 
 vision.FPIX_HDI.method: find_patches
 vision.FPIX_HDI.shrink_factor: 4
@@ -214,6 +434,18 @@ vision.FPIX_BBM.size_max: 0.02
 vision.FPIX_BBM.color_groups: 3
 vision.FPIX_BBM.aspect_ratio_min: 0.9
 vision.FPIX_BBM.aspect_ratio_max: 1.1
+
+vision.FPIX_Glass.method: find_circles
+vision.FPIX_Glass.minRadius: 0.08
+vision.FPIX_Glass.maxRadius: 0.14
+vision.FPIX_Glass.houghGradientParam1: 100
+vision.FPIX_Glass.houghGradientParam2: 50
+
+vision.FPIX_RD53A_HDI.method: find_circles
+vision.FPIX_RD53A_HDI.minRadius: 0.470
+vision.FPIX_RD53A_HDI.maxRadius: 0.530
+vision.FPIX_RD53A_HDI.houghGradientParam1: 100
+vision.FPIX_RD53A_HDI.houghGradientParam2: 50
 
 vision.FPIX_MOCK.method: find_circles
 vision.FPIX_MOCK.minRadius: 0.10
@@ -242,60 +474,85 @@ vision.FPIX_MOCK_HDI_TOP_LEFT_PAD.nominalWidth: 0.574219
 vision.FPIX_MOCK_HDI_TOP_LEFT_PAD.nominalHeight:0.612971
 vision.FPIX_MOCK_HDI_TOP_LEFT_PAD.tolerance: 0.24
 
-# Site Geometry
-# These are geometrical parameters, like the positions of chucks, specific to a site
-#Positions of HDI on Chuck 2
-siteGeometry.pos_chuck2_tr: {611.405658,529.223939,69.410398}
-siteGeometry.pos_chuck2_br: {611.604957,568.212558,69.235410}
-siteGeometry.pos_chuck2_bl: {591.915651,569.014745,69.420410}
-siteGeometry.pos_chuck2_tl: {591.718703,529.324191,69.325398}
 
-#Positions of SensorROC on Launch (Phase I launchpad)
-#Chuck 4 Slot 4
-siteGeometry.pos_senRoc_launch_tl: {711.725926,212.454066,62.521772}   
-siteGeometry.pos_senRoc_launch_br: {735.274014,253.590323,62.521772}
-siteGeometry.pos_senRoc_launch_bl: {711.662899,253.547910,62.521772}
-siteGeometry.pos_senRoc_launch_tr: {735.333300,212.502835,62.521772}
+#================================================
+#====== "Safe" (ie graph-based) motion data
+#================================================
+# Data file for the "safe move" functionality of the gantry software.
+# Here are declared labeled positions and routes among the positions
+# The gantry software will find the shortest path to get from
+# point to point
 
-#Positions of the HDI on Chuck 1
-siteGeometry.pos_chuck1_tr: {561.153536,528.698241,62.102025}
-siteGeometry.pos_chuck1_br: {561.762922,568.389308,62.102024}
-siteGeometry.pos_chuck1_bl: {542.085604,568.684087,62.102025}
-siteGeometry.pos_chuck1_tl: {541.474903,528.999977,62.032023}
+#graph_motion.pos.LABEL: {x,y,z}
+graph_motion.pos.home: {0,0,0}
+graph_motion.pos.safeUnload: {190,90,0}
+graph_motion.pos.stagingArea: {584,245,0} # {330,175,0} # {590,337,0} 
+graph_motion.pos.standAside: {584,245,0}
+graph_motion.pos.crocStaging: {584,245,0}
 
-#Positions of SensorRoc on Chuck 1
-siteGeometry.pos_senRoc1_tr: {561.991920,528.490580,62.291772}
-siteGeometry.pos_senRoc1_br: {562.267060,569.628674,62.291772}
-siteGeometry.pos_senRoc1_bl: {538.653552,569.781342,62.291772}
-siteGeometry.pos_senRoc1_tl: {538.369876,528.657561,62.291772}
+#graph_motion.pos.hdi_position: {721.430,342.000,61.432001}
+#graph_motion.pos.home_safe: {0,450.000,0}
 
-#Positions of the Top Right corners of the 4 glass slides on Launch
-#measure them now
-siteGeometry.pos_TRsenRoc_launch_tr: {735.351397,212.149743,62.521772}
-siteGeometry.pos_BRsenRoc_launch_tr: {735.397710,232.320420,62.521772}
-siteGeometry.pos_BLsenRoc_launch_tr: {723.571069,232.210150,62.521771}
-siteGeometry.pos_TLsenRoc_launch_tr: {723.507602,212.044947,62.396772}
 
-#Positions of the Top Right corners of the 4 rd53a red sensors on Launch
-#measure them now
-siteGeometry.pos_TR_ROC_launch2_tr: {735.351397,212.149743,62.521772}
-siteGeometry.pos_BR_ROC_launch2_tr: {735.397710,232.320420,62.521772}
-siteGeometry.pos_BL_ROC_launch2_tr: {723.571069,232.210150,62.521771}
-siteGeometry.pos_TL_ROC_launch2_tr: {723.507602,212.044947,62.396772}
-#HDI pick and place translation vector and rotation angle
-siteGeometry.v_hdi_translation: {-50.16,0.08749,-7.266}
-siteGeometry.rot_hdi_translation: -0.02222
+# must be 2mm above tool in z
+graph_motion.pos.tool_rack_pos_2_in: {525.825,17.555,41.4} # {678.437933,17.384062,40.4} ## TOOL RACK #0
+graph_motion.pos.tool_rack_pos_2_out: {525.825,117.555,37.5} # {677.99,100.0,37.5} TOOL RACK #0
+graph_motion.pos.tool_rack_pos_1_in: {678.437933,17.384062,40.4} # {525.825,17.555,41.4} # TOOL RACK #1
+graph_motion.pos.tool_rack_pos_1_out: {677.99,100.0,37.5} # {525.825,117.555,37.5} # TOOL RACK #1
 
-#SensorROC translation correctional terms
-siteGeometry.v_senRoc_error: {0.,0.,0.}#{-0.003,0.007,0}
-siteGeometry.rot_senRoc_error: 0.      #-0.007
 
-siteGeometry.v_ROC_error:{0.,0.,0.}
-siteGeometry.rot_ROC_error: 0.
+#graph_motion.edge.LABEL1.LABEL2 True/False
+# graph_motion.edge.home.tool_rack_pos_2_out: False
+# graph_motion.edge.tool_rack_pos_2_out.home: False
 
-# Fine correction for the ROCs to align bond pads with HDI bond pads
-### DO NOT GO BELOW 0.03 mm ###
-siteGeometry.delta_tr: {-0.035,0.070,0} # {length > 0.03,width > 0.03}
-siteGeometry.delta_br: {0.155,0.05,0} # {length > 0.03,width > 0.03}
-siteGeometry.delta_bl: {0.143,0.07,0} # {length > 0.03,width > 0.03}
-siteGeometry.delta_tl: {-0.023,0.050,0} # {length > 0.03,width > 0.03}
+graph_motion.edge.home.safeUnload: True
+graph_motion.edge.safeUnload.tool_rack_pos_2_out: True
+graph_motion.edge.stagingArea.tool_rack_pos_2_out: True
+graph_motion.edge.tool_rack_pos_2_out.tool_rack_pos_2_in: True
+# graph_motion.edge.tool_rack_pos_2_out.stagingArea: True
+graph_motion.edge.tool_rack_pos_1_out.tool_rack_pos_1_in: True
+graph_motion.edge.tool_rack_pos_1_out.safeUnload: True
+# graph_motion.edge.tool_rack_pos_1_in.home: False
+
+
+
+graph_motion.edge.standAside.safeUnload: True
+graph_motion.edge.standAside.stagingArea: True
+graph_motion.edge.standAside.tool_rack_pos_2_out: True
+graph_motion.edge.home.crocStaging: True
+graph_motion.edge.safeUnload.crocStaging: True
+
+
+# graph_motion.edge.safeUnload.standAside: True
+# graph_motion.edge.stagingArea.standAside: True
+# graph_motion.edge.tool_rack_pos_2_out.standAside: True
+# graph_motion.edge.crocStaging.home: True
+# graph_motion.edge.crocStaging.safeUnload: True
+
+
+
+#================================================
+#====== Potting procedure parameters
+#================================================
+# The curing parameters are used to adjust the speed of the needle to
+# compensate for the increasing viscosity of the encapsulant as time passes.
+# v = v_nom * (1 - A*t^2 - B*t)
+# For depositing a dot instead of a line, this value scales how long the
+# dispenser is active
+potting.sylgard.curing_param_a: 4e-9
+potting.sylgard.curing_param_b: 2e-5
+potting.sylgard.speed_nominal: 0.5 # mm/s
+potting.sylgard.time_nominal: 2.0  # s
+
+# The time delay between turning on the dispenser and beginning motion
+potting.sylgard.turn_on_time: 0.5
+# The amount of time to preemptively turn off the dispenser before motion ends
+potting.sylgard.turn_off_time: 0.1
+
+# Nominal distance between the tip of the needle and the surface during
+# encapsulation.
+potting.sylgard.tip_height: 0.180
+
+# Height of the needle as it moves between pot-lines. Must be high enough to clear
+# any obstacles on the module.
+potting.sylgard.safe_height_offset: 5 # mm
