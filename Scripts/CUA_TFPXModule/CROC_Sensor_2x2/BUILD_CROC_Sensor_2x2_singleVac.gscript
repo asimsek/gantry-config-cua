@@ -1,0 +1,386 @@
+VERSION v2.5
+######################## BUILD CROC Assembly Quad Sensor ROC #############################
+# Jaiveer Dutta, jsdutta@purdue.edu
+# Souvik Das, souvik@purdue.edu
+# Purdue University Department of Physics and Astronomy
+# April 2023
+# -----------------------------------------------------
+# Steps:
+# 1. Prompt what station the assembly will occur at
+# 2. Prompt placement of HDI and turn on the HDI's vacuum
+# 3. Prompt placement of appropriate weight tool on the HDI and switch on the vacuum
+# 4. Move the gantry to the HDI for surveillance
+# 5. Compute would-be position and rotation of HDI on Chuck i
+# 6. Prompt the placement of the Sensor ROC
+#    i. Is the end placement location clear?
+#    ii. Is the Pickup Tool ready?
+# 7. Survey the Sensor ROC
+# 8. Calculate the center of the Sensor ROC
+# 9. Pick up the Sensor ROC and place it at the position computed in Step 5
+# 10. Check that adhesive sample is made, HDI is moved and the adhesive is applied
+# 11. Prompt placement of Vacuum Tool bearing HDI onto the Sensor ROC
+# 12. Export the variables
+# 13. End program with vacuums on or off
+
+# Initialize the system
+LOADCONFIG
+HOME
+SETVAC gantry_head_inner 0
+SETVAC gantry_head_outer 0
+SETVAC croc2x2_launchROC_tr 0
+SETVAC croc2x2_launchROC_br 0
+SETVAC croc2x2_launchROC_bl 0
+SETVAC croc2x2_launchROC_tl 0
+SETVAC croc2x2_launchHDI 0
+SETVAC croc2x2_weight_0 0
+SETVAC croc2x2_weight_1 0
+SETVAC croc2x2_weight_2 0
+SETVAC croc2x2_weight_3 0
+SETVAC croc2x2_weight_4 0
+SETERRORMODE prompt
+
+# Rough position of the top-right bond pad on the CROC HDI (LaunchHDI)
+FLEXREAD $pos_croc2x2_hdi_TR siteGeometry.pos_croc2x2_hdi_TR
+
+# Rough position of the top right corner of the Sensor ROC (LaunchROC)
+FLEXREAD $pos_croc2x2_TR siteGeometry.pos_croc2x2LaunchROC_TR
+
+# Dimensions of the HDI and the Sensor ROC
+FLEXREAD $thickness_croc2x2HDI geometry.TFPX_CROC2X2_HDI.thickness
+FLEXREAD $thickness_sensorROC geometry.TFPX_CROC2x2_SENSORROC.thickness
+FLEXREAD $thickness_sensor geometry.TFPX_CROC2x2_SENSOR.thickness
+
+# Dimensions of bond pads of the HDI and the Sensor ROC
+FLEXREAD $dim_croc2x2_HDI geometry.TFPX_CROC2X2_HDI.fid_br
+FLEXREAD $dim_croc2x2_SENSORROC geometry.TFPX_CROC2X2_SENSORROC.fid_br
+
+# Statistical offsets
+FLEXREAD $delta_sensorROC siteGeometry.delta_QUADSENSORROC
+
+## Main Function ##
+
+# Step 1. Prompt what station the assembly will occur at and take in those values
+@STEP_ONE GETINTPOPUP $station "Provide the Chuck number (0-4)"
+GOTOIF @DISPLAY_ERROR `$station<0`
+GOTOIF @DISPLAY_ERROR `$station>4`
+SETLOG "LOG_BUILD_CROC_Sensor_2x2_station_{$station}.txt"
+GOTO @FLEXREADING
+@DISPLAY_ERROR CHOICEPOPUP $trash "You gave me a bad number >:(" "Sorry" "My bad"
+GOTO @STEP_ONE
+
+@FLEXREADING PASS
+FLEXREAD $pos_croc2x2_translation "siteGeometry.pos_croc2x2_translation_STAT_{$station}"
+FLEXREAD $rot_croc2x2_translation "siteGeometry.rot_croc2x2_translation_STAT_{$station}"
+SETVAC "croc2x2_chuck_{$station}" 0
+
+ADD $pos_croc2x2_translation.z $pos_croc2x2_translation.z $thickness_croc2x2HDI
+SUB $pos_croc2x2_translation.z $pos_croc2x2_translation.z $thickness_sensorROC
+
+# Step 2. Prompt placement of HDI and turn on the HDI's vacuum
+PRINT "--------------------------"
+@STEP_TWO CHOICEPOPUP $choice "Have you placed the CROC 2x2 HDI in its correct starting location?" "Yes, continue" "No, ask me again"
+GOTOIFN @STEP_TWO $choice
+SETVAC croc2x2_launchHDI 1
+
+# Step 3. Prompt placement of appropriate weight tool on the HDI and switch on the vacuum
+@STEP_THREE CHOICEPOPUP $choice "Have you placed Weight Tool {$station} on the HDI?" "Yes" "No"
+GOTOIFN @STEP_THREE $choice
+SETVAC croc2x2_weight_{$station} 1
+WAIT 1000
+SETVAC croc2x2_launchHDI 0
+
+# Step 4. Move the gantry to the HDI for surveillance
+@STEP_FOUR PASS
+MOVENAME stagingArea 100
+@HDI CHOICEPOPUP $choice "Ready to survey the HDI?" "Yes" "No, ask again"
+GOTOIFN @HDI $choice
+CALL @FINDCORNERS $pos_croc2x2_hdi_TR $dim_croc2x2_HDI -> $hdi_tr $hdi_br $hdi_bl $hdi_tl
+
+
+# Step 5. Compute the would-be position and rotation of HDI on correct Chuck
+FIT $pos_croc2x2_hdi_initial $rot_croc2x2_hdi_initial $_ TFPX_CROC2X2_HDI $hdi_tr $hdi_br $hdi_bl $hdi_tl
+QUAT2EULER $rot_croc2x2_hdi_initial $trash $trash1 $rot_croc2x2_hdi_initial
+ADD $pos_croc2x2_hdi_final $pos_croc2x2_hdi_initial $pos_croc2x2_translation
+ADD $rot_croc2x2_hdi_final $rot_croc2x2_hdi_initial $rot_croc2x2_translation
+
+# Step 6. Prompt the placement of the Quad Sensor ROC
+@STEP_SIX MOVENAME stagingArea
+SETVAC gelpak_release 1
+CHOICEPOPUP $choice "Have you placed the Quad Sensor ROC in its starting position?" "Yes, continue" "No, ask me again"
+GOTOIFN @STEP_SIX $choice
+SETVAC gelpak_release 0
+SETVAC croc2x2_launchROC_tr 1
+SETVAC croc2x2_launchROC_br 1
+SETVAC croc2x2_launchROC_bl 1
+SETVAC croc2x2_launchROC_tl 1
+
+  #i. Is the end placement location clear?
+@STEP_SIX_i CHOICEPOPUP $choice "Is chuck {$station} clear?" "Yes, continue" "No, ask me again"
+GOTOIFN @STEP_SIX_i $choice
+
+  #ii. Is the Weight Tool ready?
+@STEP_SIX_ii CHOICEPOPUP $choice "Is Weight Tool {$station} ready?" "Yes, continue" "No, ask me again"
+GOTOIFN @STEP_SIX_ii $choice
+
+# Step 7. Survey the Quad Sensor ROC
+@STEP_SEVEN PASS
+@QUADSENROC CHOICEPOPUP $choice "Ready to survey the Quad Sensor ROC?" "Yes" "No, ask again"
+GOTOIFN @QUADSENROC $choice
+CALL @FINDCORNERS $pos_croc2x2_TR $dim_croc2x2_SENSORROC -> $quadsenroc_tr $quadsenroc_br $quadsenroc_bl $quadsenroc_tl
+
+# Step 8. Compute the current position and rotation of QUAD Sensor ROC on LaunchROC
+FIT $pos_croc2x2_senroc_initial $rot_croc2x2_senroc_initial $_ TFPX_CROC2X2_SENSORROC $quadsenroc_tr $quadsenroc_br $quadsenroc_bl $quadsenroc_tl
+QUAT2EULER $rot_croc2x2_senroc_initial $trash $trash1 $rot_croc2x2_senroc_initial
+SUB $pos_croc2x2_senroc_initial.z $pos_croc2x2_senroc_initial.z $thickness_sensor
+
+# Step 9. Pick up the Quad Sensor ROC and place it at the position/rotation computed in Step 4
+@STEP_NINE PASS
+MOVENAME tool_rack_pos_2_out 200
+LOADTOOL picker_tool
+MOVENAME stagingArea 100
+
+  #############################
+  # Pickup Step #
+CALL @CALCPICKUP $pos_croc2x2_senroc_initial -> $pos $pos_z0
+CALL @PICKUPPART $pos $pos_z0 $rot_croc2x2_senroc_initial
+
+CHOICEPOPUP $choice "Did the gantry pick up the Quad Sensor ROC?" "Yes" "No, resurvey"
+GOTOIF @PLACESTEP $choice
+SETVAC gantry_head_inner 0
+ROTATETO 0 10
+MOVENAME tool_rack_pos_2_out 200
+UNLOADTOOL
+GOTO @STEP_SIX
+
+  # Place Step #
+@PLACESTEP PASS
+CALL @CALCPICKUP $pos_croc2x2_hdi_final -> $pos $pos_z0
+CALL @PLACEPART $pos $pos_z0 $rot_croc2x2_hdi_final $station
+  ##############################################################
+
+ROTATETO 0 10
+MOVENAME tool_rack_pos_2_out 200
+UNLOADTOOL
+
+# Step 10. Check that adhesive sample is made, HDI is moved and the adhesive is applied
+@STEP_TEN CHOICEPOPUP $choice "Have you made and set aside an adhesive sample?" "Yes, continue" "No, ask me again"
+GOTOIFN @STEP_TEN $choice
+@STEP_TEN_i CHOICEPOPUP $choice "Did you move the HDI to the Weight Tool Launchpad and apply the adhesive?" "Yes, continue" "No, ask me again"
+GOTOIFN @STEP_TEN_i $choice
+
+# Step 11. Prompt placement of Weight Tool bearing HDI onto the Sensor ROC
+@STEP_ELEVEN CHOICEPOPUP $choice "Did you place the HDI on the four CROCs on Chuck {$station} (With adhesive between them)?" "Yes, continue" "No, ask me again"
+GOTOIFN @STEP_ELEVEN $choice
+
+# Step 12. Export the variables
+@STEP_TWELVE PASS
+CALL @EXPORTVARS $pos_croc2x2_hdi_final $rot_croc2x2_hdi_final $station
+
+# Step 13. End program with vacuums on or off
+CHOICEPOPUP $choice "Do you want to leave the vacuums on?" "Yes, leave them on" "No, turn them off"
+GOTOIF @STEP_END $choice
+
+SETVAC gantry_head_inner 0
+SETVAC gantry_head_outer 0
+SETVAC croc2x2_launchROC_tr 0
+SETVAC croc2x2_launchROC_br 0
+SETVAC croc2x2_launchROC_bl 0
+SETVAC croc2x2_launchROC_tl 0
+SETVAC croc2x2_launchHDI 0
+SETVAC croc2x2_chuck_{$station} 0
+SETVAC gelpak_release 0
+SETVAC croc2x2_weight_{$station} 0
+
+@STEP_END HOME
+
+END
+
+
+# SURVEYPOS
+# Arguments:
+# $x_corner - Approximate position of an object that you would like to know the precise position. Returns with precise position written in this location
+#
+# Returns:
+# $x_corner - Updated position of the corner that is being looked for
+@SURVEYPOS(x_corner)
+  MOVESAFE $x_corner 100
+  @SURCORNPOP VIDEO
+  CHOICEPOPUP $choice "Did you correctly align the cursor with the marker?" "Yes" "No"
+  GOTOIFN @SURCORNPOP $choice
+  GETPOS $x_corner
+  RETURN $x_corner
+
+
+# FINDCORNERS
+# Arguments:
+# $top_right - rough position of the top-right bond pad
+# $half_bond_dim - vector containing half-width/length between bond pads
+#
+# Returns:
+# $tr - center of top-right bond pad
+# $br - center of bottom-right bond pad
+# $bl - center of bottom-left bond pad
+# $tl - center of top-left bond pad
+@FINDCORNERS(top_right,half_bond_dim)
+  # Obtain full width and length dimensions
+  MUL $bond_dim $half_bond_dim {2,2,0}
+
+  # Find positions of opposite corners of top-right bond pad
+  @FIND_0 CHOICEPOPUP $choice "Ready to find a corner of the top-right bond pad?" "Yes" "No"
+  GOTOIFN @FIND_0 $choice
+  CALL @SURVEYPOS $top_right -> $tr_1
+
+  @FIND_1 CHOICEPOPUP $choice "Ready to find the opposite corner of the top-right bond pad?" "Yes" "No"
+  GOTOIFN @FIND_1 $choice
+  CALL @SURVEYPOS $tr_1 -> $tr_2
+
+  # Obtain rough coordinates for bottom-right bond pad
+  COPY $bot_right $tr_2
+  ADD $bot_right.y $bot_right.y $bond_dim.y
+
+  # Find positions of opposite corners of bottom-right bond pad
+  @FIND_2 CHOICEPOPUP $choice "Ready to find a corner of the bottom-right bond pad?" "Yes" "No"
+  GOTOIFN @FIND_2 $choice
+  CALL @SURVEYPOS $bot_right -> $br_1
+
+  @FIND_3 CHOICEPOPUP $choice "Ready to find the opposite corner of the bottom-right bond pad?" "Yes" "No"
+  GOTOIFN @FIND_3 $choice
+  CALL @SURVEYPOS $br_1 -> $br_2
+
+  # Obtain rough coordinates for bottom-left bond pad
+  COPY $bot_left $br_2
+  SUB $bot_left.x $bot_left.x $bond_dim.x
+
+  # Find positions of opposite corners of bottom-left bond pad
+  @FIND_4 CHOICEPOPUP $choice "Ready to find a corner of the bottom-left bond pad?" "Yes" "No"
+  GOTOIFN @FIND_4 $choice
+  CALL @SURVEYPOS $bot_left -> $bl_1
+
+  @FIND_5 CHOICEPOPUP $choice "Ready to find the opposite corner of the bottom-left bond pad?" "Yes" "No"
+  GOTOIFN @FIND_5 $choice
+  CALL @SURVEYPOS $bl_1 -> $bl_2
+
+  # Obtain rough coordinates for top-left bond pad
+  COPY $top_left $bl_2
+  SUB $top_left.y $top_left.y $bond_dim.y
+
+  # Find positions of opposite corners of top-left bond pad
+  @FIND_6 CHOICEPOPUP $choice "Ready to find a corner of the top-left bond pad?" "Yes" "No"
+  GOTOIFN @FIND_6 $choice
+  CALL @SURVEYPOS $top_left -> $tl_1
+
+  @FIND_7 CHOICEPOPUP $choice "Ready to find the opposite corner of the top-left bond pad?" "Yes" "No"
+  GOTOIFN @FIND_7 $choice
+  CALL @SURVEYPOS $tl_1 -> $tl_2
+
+  # Average each pair of corner positions
+
+  ADD $tr $tr_1 $tr_2
+  MUL $tr $tr {0.5,0.5,0.5}
+
+  ADD $br $br_1 $br_2
+  MUL $br $br {0.5,0.5,0.5}
+
+  ADD $bl $bl_1 $bl_2
+  MUL $bl $bl {0.5,0.5,0.5}
+
+  ADD $tl $tl_1 $tl_2
+  MUL $tl $tl {0.5,0.5,0.5}
+
+  RETURN $tr $br $bl $tl
+
+
+# CALCPICKUP
+# Arguments:
+#  $target_pos - center of piece to pickup/place
+#
+# Returns:
+#  $pickup_pos - pickup position
+#  $pickup_pos_z0 - pickup position with z = 0
+@CALCPICKUP(target_pos)
+  FLEXREAD $picker_height geometry.PICKER_TOOL.center_offset
+  FLEXREAD $ghco geometry.tool_holder_offset
+  ADD $netoffset $picker_height $ghco
+  SUB $pickup_pos $target_pos $netoffset
+  COPY $pickup_pos_z0 $pickup_pos
+  COPY $pickup_pos_z0.z 0
+  RETURN $pickup_pos $pickup_pos_z0
+
+
+# PICKUPPART
+# takes place directly after CALCPICKUP
+# Arguments:
+#  $pick_pos - pickup position
+#  $pick_pos_z0 - pickup position with z = 0
+#  $pick_rot - rotation of the what is being picked up
+#
+# No Returns
+@PICKUPPART(pick_pos,pick_pos_z0,pick_rot)
+  MOVESAFE $pick_pos_z0 200
+  ROTATETO $pick_rot 10
+  SUB $pick_pos.z $pick_pos.z 2
+  MOVETO $pick_pos 50
+  ADD $pick_pos.z $pick_pos.z 2
+  MOVETO $pick_pos 1
+  WAIT 500
+  SETVAC gantry_head_inner 1
+  WAIT 2000
+
+  # Release LaunchROC vacuums
+  SETVAC croc2x2_launchROC_tr 0
+  SETVAC croc2x2_launchROC_br 0
+  SETVAC croc2x2_launchROC_bl 0
+  SETVAC croc2x2_launchROC_tl 0
+
+  WAIT 1000
+  SUB $pick_pos.z $pick_pos.z 1
+  MOVETO $pick_pos 0.4
+  MOVETO $pick_pos_z0 25
+  RETURN
+
+
+# PLACEPART
+# takes place directly after CALCPICKUP
+# Arguments:
+#  $place_pos - pickup position
+#  $place_pos_z0 - pickup position with z = 0
+#  $place_rot - rotation of the what is being picked up
+#  $stat - station number
+#
+# No Returns
+@PLACEPART(place_pos,place_pos_z0,place_rot,stat)
+  MOVESAFE $place_pos_z0 200
+  ROTATETO $place_rot 10
+  SUB $place_pos.z $place_pos.z 2
+  MOVETO $place_pos 50
+  ADD $place_pos.z $place_pos.z 2
+  MOVETO $place_pos 1
+  WAIT 500
+
+  SETVAC "croc2x2_chuck_{$stat}" 1
+  WAIT 1000
+  SETVAC gantry_head_inner 0
+  WAIT 2000
+  SUB $place_pos.z $place_pos.z 2
+  MOVETO $place_pos 1
+  MOVETO $place_pos_z0 25
+  RETURN
+
+# EXPORTVARS
+# The goal is to pass all variables necessary for surveillance
+# Arguments:
+#  $hdi_pos - center position of HDI
+#  $hdi_rot - rotation of HDI
+#  $stat_num - station number
+#
+# No returns
+@EXPORTVARS(hdi_pos,hdi_rot,stat_num)
+  SETLOG "LOG_OUTPUT_CROC_Sensor_2x2_station_{$stat_num}.txt"
+  CLEARLOG
+  PRINT ""
+    #HDI position data
+  XPRINT "quad.pos_hdi_final: %v" $hdi_pos
+    #Rotational data
+  XPRINT "quad.rot_hdi_final: %f" $hdi_rot
+  PRINT""
+  RETURN
