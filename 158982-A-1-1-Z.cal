@@ -1,0 +1,21 @@
+;***************************************************************************
+;***************          Aerotech Axis Calibration           **************
+;Axis System Serial Number: 158982-A-1-1-Z
+;Axis Stage Serial Number: 158982
+;Date Tested: April 12, 2023 13:14:17 EDT
+;Optic Location: STD
+;Payload: OPTIC
+;Average Air Temperature (°C): 23.51
+;Average Material Temperature (°C): 23.56
+;Average Air Pressure (mmHg): 734.75
+;Average Air Humidity (%): 37.83
+;CountsPerUnit Parameter: 500000.000000
+;***************************************************************************
+:START 4 SAMPLEDIST=-10 POSUNIT=PRIMARY CORUNIT=PRIMARY/1000
+:START EXPANDCOEFF=1.17E-05 MATERIALTEMP=20.00
+:START HOMEDIRECTION=CW HOMEOFFSET=1.7095 FULLTRAVEL=100.2
+:START SERIALNUMBER="158982-A-1-1"
+0.000000	0.430500	1.477000	2.701000	3.963000	4.850500
+5.842000	6.862000	8.019500	9.383000	9.616000	0.000000
+:END
+
