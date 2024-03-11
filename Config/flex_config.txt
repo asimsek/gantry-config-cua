@@ -345,11 +345,11 @@ siteGeometry.rot_ROC_error: 0.
 ### QuadROC Information
 
 # HDI position data
-siteGeometry.pos_croc2x2_hdi_TR: {657.609975,523.868918,93.850474}
+siteGeometry.pos_croc2x2_hdi_TR: {657.582514,523.521146,93.800473}
 siteGeometry.pos_final_croc2x2_hdi_tr: {507.855616,523.426771,87.375407}
 
  # QuadROC position data
-siteGeometry.pos_croc2x2LaunchROC_TR: {584.641277,521.983804,93.736025}
+siteGeometry.pos_croc2x2LaunchROC_TR: {584.730885,522.345364,93.781025}
 siteGeometry.pos_croc2x2LaunchROC_BR: {584.828988,543.828198,93.201044}
 siteGeometry.pos_croc2x2LaunchROC_BL: {566.075420,543.886810,93.201100}
 siteGeometry.pos_croc2x2LaunchROC_TL: {565.982649,522.120571,93.201077}
