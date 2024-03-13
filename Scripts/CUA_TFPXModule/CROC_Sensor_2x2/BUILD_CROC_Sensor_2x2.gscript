@@ -137,7 +137,7 @@ FIT $pos_croc2x2_senroc_initial $rot_croc2x2_senroc_initial $_ TFPX_CROC2X2_SENS
 QUAT2EULER $rot_croc2x2_senroc_initial $trash $trash1 $rot_croc2x2_senroc_initial
 SUB $pos_croc2x2_senroc_initial.z $pos_croc2x2_senroc_initial.z $thickness_sensor
 
-# Step 9. Pick up the Quad Sensor ROC and place it at the position/rotation computed in Step 4
+# Step 9. Pick up the Quad Sensor ROC and place it at the position/rotation computed in Step 5
 @STEP_NINE PASS
 MOVENAME tool_rack_pos_2_out 100
 LOADTOOL picker_tool
