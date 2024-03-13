@@ -17,7 +17,7 @@ VERSION v2.5
 # 7. Survey the Sensor ROC
 # 8. Calculate the center of the Sensor ROC
 # 9. Pick up the Sensor ROC and place it at the position computed in Step 5
-# 10. Check that adhesive sample is made, HDI is moved and the adhesive is applied
+# 10. Check that the adhesive sample is made, HDI is moved, and the adhesive is applied
 # 11. Prompt placement of Vacuum Tool bearing HDI onto the Sensor ROC
 # 12. Export the variables
 # 13. End program with vacuums on or off
@@ -97,7 +97,7 @@ GOTOIFN @HDI $choice
 CALL @FINDCORNERS $pos_croc2x2_hdi_TR $dim_croc2x2_HDI -> $hdi_tr $hdi_br $hdi_bl $hdi_tl
 
 
-# Step 5. Compute the would-be position and rotation of HDI on correct Chuck
+# Step 5. Compute the would-be position and rotation of HDI on the correct Chuck
 FIT $pos_croc2x2_hdi_initial $rot_croc2x2_hdi_initial $_ TFPX_CROC2X2_HDI $hdi_tr $hdi_br $hdi_bl $hdi_tl
 QUAT2EULER $rot_croc2x2_hdi_initial $trash $trash1 $rot_croc2x2_hdi_initial
 ADD $pos_croc2x2_hdi_final $pos_croc2x2_hdi_initial $pos_croc2x2_translation
@@ -152,6 +152,18 @@ MOVENAME tool_rack_pos_2_out 200
 UNLOADTOOL
 GOTO @STEP_SIX
 
+  # Make fine adjustments to the final position of the CROC 2x2 based on HDI position, rotation and delta
+COS $cos_rot_hdi $rot_croc2x2_hdi_final
+SIN $sin_rot_hdi $rot_croc2x2_hdi_final
+MUL $delta_x_y $delta_sensorROC.y $sin_rot_hdi
+MUL $delta_x_x $delta_sensorROC.x $cos_rot_hdi
+ADD $delta_x $delta_x_y $delta_x_x
+MUL $delta_y_y $delta_sensorROC.y $cos_rot_hdi
+MUL $delta_y_y $delta_y_y -1
+MUL $delta_y_x $delta_sensorROC.x $sin_rot_hdi
+ADD $delta_y $delta_y_x $delta_y_y
+ADD $pos_croc2x2_hdi_final $pos_croc2x2_hdi_final {$delta_x,$delta_y,0}
+
   # Place Step #
 @PLACESTEP PASS
 CALL @CALCPICKUP $pos_croc2x2_hdi_final -> $pos $pos_z0
@@ -162,7 +174,7 @@ ROTATETO 0 10
 MOVENAME tool_rack_pos_2_out 200
 UNLOADTOOL
 
-# Step 10. Check that adhesive sample is made, HDI is moved and the adhesive is applied
+# Step 10. Check that the adhesive sample is made, HDI is moved, and the adhesive is applied
 @STEP_TEN CHOICEPOPUP $choice "Have you made and set aside an adhesive sample?" "Yes, continue" "No, ask me again"
 GOTOIFN @STEP_TEN $choice
 @STEP_TEN_i CHOICEPOPUP $choice "Did you move the HDI to the Weight Tool Launchpad and apply the adhesive?" "Yes, continue" "No, ask me again"
