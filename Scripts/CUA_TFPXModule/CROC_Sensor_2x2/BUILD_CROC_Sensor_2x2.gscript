@@ -156,6 +156,15 @@ MOVENAME tool_rack_pos_2_out 100
 UNLOADTOOL
 GOTO @STEP_SIX
 
+# Make fine adjustments to final position of the CROC 2x2 based on HDI position, rotation and delta
+COS $cos_rot_hdi $rot_croc2x2_hdi_final
+SIN $sin_rot_hdi $rot_croc2x2_hdi_final
+MUL $delta_x $delta_sensorROC $cos_rot_hdi
+MUL $delta_y $delta_sensorROC $sin_rot_hdi
+MUL $delta_y $delta_y -1
+ADD $pos_croc2x2_hdi_final $pos_croc2x2_hdi_final {$delta_x,$delta_y,0}
+
+
   # Place Step #
 @PLACESTEP PASS
 CALL @CALCPICKUP $pos_croc2x2_hdi_final -> $pos $pos_z0
