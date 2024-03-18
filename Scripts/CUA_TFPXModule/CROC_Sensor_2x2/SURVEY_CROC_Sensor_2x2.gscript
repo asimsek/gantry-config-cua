@@ -10,34 +10,31 @@ VERSION v2.5
 # 16. Move gantry head to the module and survey for accuracy
 # 17. End program with vacuums on or off
 
-# Initialize the system
+  # Initialize the system
 LOADCONFIG
 HOME
 SETVAC croc2x2_weight_0 0
 
-# Dimensions of the HDI and the Sensor ROC
+  # Dimensions of the HDI and the Sensor ROC
 FLEXREAD $thickness_croc2x2HDI geometry.TFPX_CROC2X2_HDI.thickness
 FLEXREAD $thickness_sensorROC geometry.TFPX_CROC2x2_SENSORROC.thickness
 FLEXREAD $thickness_sensor geometry.TFPX_CROC2x2_SENSOR.thickness
 
-# Dimensions of bond pads of the HDI and the Sensor ROC
+  # Dimensions of bond pads of the HDI and the Sensor ROC
 FLEXREAD $dim_croc2x2_HDI geometry.TFPX_CROC2X2_HDI.fid_br
 #MUL $dim_croc2x2_HDI_half $dim_croc2x2_HDI {0.5,0.5,0}
 FLEXREAD $dim_croc2x2_SENSORROC geometry.TFPX_CROC2X2_SENSORROC.fid_br
-FLEXREAD $len_hdi_bondpads geometry.dist_quadHDI_bondpads
+FLEXREAD $len_hdi_bondpads geometry.TFPX_CROC2x2_SENSOR.dist_HDI_bondpads
+FLEXREAD $len_CROC_bondpads geometry.TFPX_CROC2x2_SENSORROC.dist_bondpads
+#FLEXREAD $len_hdi_bondpads geometry.dist_quadHDI_bondpads
 
-# Dimensions of component ROCs in Sensor ROC
+  # Dimensions of component ROCs in Sensor ROC
 FLEXREAD $dist_quadROC_bondpads geometry.dist_quadROC_bondpads
+  # Dimensions of component HDI
+FLEXREAD $len_quadROC_bondpads geometry.len_quadROC_bondpads
 
-
-# Parameters that can help line up the bond pads
-#FLEXREAD $delta_tr siteGeometry.delta_croc2x2_tr
-#FLEXREAD $delta_br siteGeometry.delta_croc2x2_br
-#FLEXREAD $delta_bl siteGeometry.delta_croc2x2_bl
-#FLEXREAD $delta_tl siteGeometry.delta_croc2x2_tl
-
-## Continuing the script ##
-# Step 14. Prompt what station the survey will occur at, then load appropriate data
+  ## Continuing the script ##
+  # Step 14. Prompt what station the survey will occur at, then load appropriate data
 @STEP_FOURTEEN GETINTPOPUP $station "Provide the Chuck number (0-4)"
 GOTOIF @DISPLAY_ERROR `$station<0`
 GOTOIF @DISPLAY_ERROR `$station>4`
@@ -50,35 +47,47 @@ GOTO @STEP_FOURTEEN
 FLEXREAD $pos_hdi_final quad.pos_hdi_final
 FLEXREAD $rot_hdi_final quad.rot_hdi_final
 
-# Step 15. Calculate the placement of the HDI and Sensor ROC bondpads on each corner
+  # Step 15. Calculate the placement of the HDI and Sensor ROC bondpads on each corner
 @STEP_FIFTEEN PASS
 
+#MUL $rad_angle $rot_hdi_final 0.01745329251
 SIN $sin_rot $rot_hdi_final
 COS $cos_rot $rot_hdi_final
 
-  #Displacement vector for bondpads
+  #Displacement vector for CROC bondpads
 MUL $bondpads_sin $dist_quadROC_bondpads $sin_rot
 MUL $bondpads_cos $dist_quadROC_bondpads $cos_rot
 COPY $v_bondpads {0,0,0}
 SUB $v_bondpads.x $v_bondpads.x $bondpads_sin
 COPY $v_bondpads.y $bondpads_cos
 
+  #Displacement vector for HDI bondpads
+MUL $bondpads_HDI_sin $len_quadROC_bondpads $sin_rot
+MUL $bondpads_HDI_cos $len_quadROC_bondpads $cos_rot
+COPY $v_HDI_bondpads {0,0,0}
+SUB $v_HDI_bondpads.x $v_HDI_bondpads.x $bondpads_HDI_sin
+COPY $v_HDI_bondpads.y $bondpads_HDI_cos
+
+  #HDI
+#ADD $pos_hdi_final.z $pos_hdi_final.z $thickness_croc2x2HDI
+CALL @CALCCORNERS $pos_hdi_final $rot_hdi_final $dim_croc2x2_HDI -> $pos_TR_hdi_top $pos_BR_hdi_bot $pos_BL_hdi_bot $pos_TL_hdi_top
+ADD $pos_TR_hdi_bot $pos_TR_hdi_top $v_HDI_bondpads
+SUB $pos_BR_hdi_top $pos_BR_hdi_bot $v_HDI_bondpads
+SUB $pos_BL_hdi_top $pos_BL_hdi_bot $v_HDI_bondpads
+ADD $pos_TL_hdi_bot $pos_TL_hdi_top $v_HDI_bondpads
+
   #CROC
+ADD $pos_hdi_final.z $pos_hdi_final.z $thickness_croc2x2HDI
+ADD $pos_hdi_final.z $pos_hdi_final.z $thickness_sensor
 CALL @CALCCORNERS $pos_hdi_final $rot_hdi_final $dim_croc2x2_SENSORROC -> $pos_TR_SENROC_top $pos_BR_SENROC_bot $pos_BL_SENROC_bot $pos_TL_SENROC_top
 ADD $pos_TR_SENROC_bot $pos_TR_SENROC_top $v_bondpads
 SUB $pos_BR_SENROC_top $pos_BR_SENROC_bot $v_bondpads
 SUB $pos_BL_SENROC_top $pos_BL_SENROC_bot $v_bondpads
 ADD $pos_TL_SENROC_bot $pos_TL_SENROC_top $v_bondpads
 
-  #HDI
-SUB $pos_hdi_final.z $pos_hdi_final.z $thickness_croc2x2HDI
-CALL @CALCCORNERS $pos_hdi_final $rot_hdi_final $dim_croc2x2_HDI -> $pos_TR_hdi_top $pos_BR_hdi_bot $pos_BL_hdi_bot $pos_TL_hdi_top
-ADD $pos_TR_hdi_bot $pos_TR_hdi_top $v_bondpads
-SUB $pos_BR_hdi_top $pos_BR_hdi_bot $v_bondpads
-SUB $pos_BL_hdi_top $pos_BL_hdi_bot $v_bondpads
-ADD $pos_TL_hdi_bot $pos_TL_hdi_top $v_bondpads
 
-# Step 16. Move gantry head to the module and survey for accuracy
+
+  # Step 16. Move gantry head to the module and survey for accuracy
 @STEP_SIXTEEN PASS
 @ACC_0 CHOICEPOPUP $choice "Ready to survey the Top Right CROC's accuracy?"
 GOTOIFN @ACC_0 $choice
@@ -101,7 +110,7 @@ PRINT "Avg(delta(Y)): %f" $BR_ady
 
 @ACC_2 CHOICEPOPUP $choice "Ready to survey the Bottom Left CROC's accuracy?"
 GOTOIFN @ACC_2 $choice
-CALL @QUARTERSURVEILLANCE $pos_BL_hdi_top $pos_BL_hdi_bot $pos_BL_SENROC_top $pos_BL_SENROC_bot -1 -> $BL_ddx $BL_ady
+CALL @QUARTERSURVEILLANCE $pos_BL_hdi_top $pos_BL_hdi_bot $pos_BL_SENROC_top $pos_BL_SENROC_bot +1 -> $BL_ddx $BL_ady
 
 PRINT "---------------------"
 PRINT "Bottom Left"
@@ -110,7 +119,7 @@ PRINT "Avg(delta(Y)): %f" $BL_ady
 
 @ACC_3 CHOICEPOPUP $choice "Ready to survey the Top Left CROC's accuracy?"
 GOTOIFN @ACC_3 $choice
-CALL @QUARTERSURVEILLANCE $pos_TL_hdi_top $pos_TL_hdi_bot $pos_TL_SENROC_top $pos_TL_SENROC_bot -1 -> $TL_ddx $TL_ady
+CALL @QUARTERSURVEILLANCE $pos_TL_hdi_top $pos_TL_hdi_bot $pos_TL_SENROC_top $pos_TL_SENROC_bot +1 -> $TL_ddx $TL_ady
 
 PRINT "---------------------"
 PRINT "Top Left"
@@ -119,7 +128,7 @@ PRINT "Avg(delta(Y)): %f" $TL_ady
 
 HOME
 
-# Step 17. End program with vacuums on or off
+  # Step 17. End program with vacuums on or off
 @STEP_SEVENTEEN PASS
 CHOICEPOPUP $choice "Has the glue been cured according to the sample previously set aside?" "Yes" "No"
 GOTOIFN @STEP_SEVENTEEN $choice
@@ -149,7 +158,7 @@ SETVAC "croc2x2_chuck_{$station}" 0
 # Returns:
 # $x_corner - Updated position of the corner that is being looked for
 @SURVEYCORNERS(x_corner)
-  MOVESAFE $x_corner 100
+  MOVESAFE $x_corner 200
   @SURCORNPOP VIDEO
   CHOICEPOPUP $choice "Did you correctly align the cursor with the marker?" "Yes" "No"
   GOTOIFN @SURCORNPOP $choice
@@ -215,15 +224,16 @@ SETVAC "croc2x2_chuck_{$station}" 0
 #  $d_DeltaX   - opening angle
 #  $avg_DeltaY - slide
 @QUARTERSURVEILLANCE(top_hdi,bot_hdi,top_roc,bot_roc,sign)
-  MOVESAFE $top_hdi 50
+  MOVESAFE $top_hdi 200
 
   # HDI bond pads, top and bottom
   @HDI_TOP_OUTER CHOICEPOPUP $choice "Ready to survey the HDI's upper bond pad's any corner?"
   GOTOIFN @HDI_TOP_OUTER $choice
   CALL @SURVEYCORNERS  $top_hdi -> $top_hdi_outer
   COPY $top_hdi_inner $top_hdi_outer
-  MUL $len_bondHDI_signed $len_hdi_bondpads $sign
-  ADD $top_hdi_inner.x $top_hdi_outer.x $len_bondHDI_signed
+  MUL $len_bondHDI_signed_x $len_hdi_bondpads.x $sign
+  ADD $top_hdi_inner.x $top_hdi_outer.x $len_bondHDI_signed_x
+  ADD $top_hdi_inner.y $top_hdi_outer.y $len_hdi_bondpads.y
   @HDI_TOP_INNER CHOICEPOPUP $choice "Ready to survey the HDI's upper bond pad's opposite corner?"
   GOTOIFN @HDI_TOP_INNER $choice
   CALL @SURVEYCORNERS $top_hdi_inner -> $top_hdi_inner
@@ -235,7 +245,9 @@ SETVAC "croc2x2_chuck_{$station}" 0
   GOTOIFN @HDI_BOT_OUTER $choice
   CALL @SURVEYCORNERS  $bot_hdi -> $bot_hdi_outer
   COPY $bot_hdi_inner $bot_hdi_outer
-  ADD $bot_hdi_inner.x $bot_hdi_outer.x $len_bondHDI_signed
+  MUL $len_bondHDI_signed_x $len_hdi_bondpads.x $sign
+  ADD $bot_hdi_inner.x $bot_hdi_outer.x $len_bondHDI_signed_x
+  SUB $bot_hdi_inner.y $bot_hdi_outer.y $len_hdi_bondpads.y
   @HDI_BOT_INNER CHOICEPOPUP $choice  "Ready to survey the HDI's lower bond pad's opposite corner?"
   GOTOIFN @HDI_BOT_INNER $choice
   CALL @SURVEYCORNERS $bot_hdi_inner -> $bot_hdi_inner

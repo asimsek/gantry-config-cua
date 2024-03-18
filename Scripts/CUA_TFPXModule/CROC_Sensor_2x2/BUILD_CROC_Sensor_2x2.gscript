@@ -336,10 +336,10 @@ END
 #
 # No Returns
 @PICKUPPART(pick_pos,pick_pos_z0,pick_rot)
-  MOVESAFE $pick_pos_z0 50
+  MOVESAFE $pick_pos_z0 100
   ROTATETO $pick_rot 10
   SUB $pick_pos.z $pick_pos.z 2
-  MOVETO $pick_pos 50
+  MOVETO $pick_pos 100
   ADD $pick_pos.z $pick_pos.z 2
   MOVETO $pick_pos 1
   WAIT 500
@@ -369,10 +369,10 @@ END
 #
 # No Returns
 @PLACEPART(place_pos,place_pos_z0,place_rot,stat)
-  MOVESAFE $place_pos_z0 50
+  MOVESAFE $place_pos_z0 100
   ROTATETO $place_rot 10
   SUB $place_pos.z $place_pos.z 2
-  MOVETO $place_pos 50
+  MOVETO $place_pos 100
   ADD $place_pos.z $place_pos.z 2
   MOVETO $place_pos 1
   WAIT 500

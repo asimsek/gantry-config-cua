@@ -196,10 +196,11 @@ geometry.dist_dualROC_bondpads: 21.064 #mm
 
 geometry.TFPX_CROC2X2_HDI.thickness: 0.140
 geometry.TFPX_CROC2X2_QUADROC.thickness: 0.808 
-geometry.dist_quadHDI_bondpads: 0.27 #REMEASURE
-geometry.dist_quadROC_bondpads: 21.064 #REMEASURE
+geometry.dist_quadHDI_bondpads: 0.27 #mm
+geometry.dist_quadROC_bondpads: 21.064 #mm
+geometry.len_quadROC_bondpads: 21.234 #mm
 
-geometry.TFPX_CROC2X2_HDI.fid_tr: {16.703,-21.592,0}
+geometry.TFPX_CROC2X2_HDI.fid_tr: {16.703,-21.592,0} # {16.657,-21.537,0}
 geometry.TFPX_CROC2X2_HDI.fid_br: {16.703,21.592,0}
 geometry.TFPX_CROC2X2_HDI.fid_bl: {-16.703,21.592,0}
 geometry.TFPX_CROC2X2_HDI.fid_tl: {-16.703,-21.592,0}
@@ -209,12 +210,15 @@ geometry.TFPX_CROC2X2_QUADROC.fid_br: {9.304,10.820,0}
 geometry.TFPX_CROC2X2_QUADROC.fid_bl: {-9.304,10.820,0}
 geometry.TFPX_CROC2X2_QUADROC.fid_tl: {-9.304,-10.820,0}
 
-geometry.TFPX_CROC2X2_SENSORROC.fid_tr: {18.622,-21.500,0} 
-geometry.TFPX_CROC2X2_SENSORROC.fid_br: {18.622,21.500,0} 
+geometry.TFPX_CROC2X2_SENSORROC.fid_tr: {18.622,-21.500,0}
+geometry.TFPX_CROC2X2_SENSORROC.fid_br: {18.622,21.500,0}
 geometry.TFPX_CROC2X2_SENSORROC.fid_bl: {-18.622,21.500,0} 
 geometry.TFPX_CROC2X2_SENSORROC.fid_tl: {-18.622,-21.500,0} 
 geometry.TFPX_CROC2x2_SENSORROC.thickness: 0.320
+geometry.TFPX_CROC2x2_SENSORROC.dist_bondpads: {0.1,0.07,0} #mm
+geometry.TFPX_CROC2x2_SENSOR.dist_HDI_bondpads: {0.27,0.09,0} #mm
 geometry.TFPX_CROC2x2_SENSOR.thickness: 0.165
+
 
 geometry.TFPX_CROC2X2_QUADTHERMALROC.fid_tr: {19.025, -20.784,0}
 geometry.TFPX_CROC2X2_QUADTHERMALROC.fid_br: {19.025, 20.784,0}
