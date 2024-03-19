@@ -252,8 +252,8 @@ SETVAC "croc2x2_chuck_{$station}" 0
 #  $ROC - Center position for the ROC bond pad
 #
 # Returns:
-#  $delta_x
-#  $delta_y
+#  $d_x - DeltaX between from HDI to CROC
+#  $d_y - DeltaY between from HDI to CROC
 @SURVEYCALC(hdi,ROC)
   #Slope
   SUB $d_y $hdi.y $ROC.y
