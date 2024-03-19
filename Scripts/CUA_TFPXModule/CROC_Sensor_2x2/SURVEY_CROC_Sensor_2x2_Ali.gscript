@@ -100,7 +100,7 @@ PRINT "Avg(delta(Y)): %f" $avgY_left
 #PRINT "Avg(Slope): %f" $avgSlope_left
 PRINT " "
 PRINT "---------------------"
-PRINT "Overal Meaningful Values:"
+PRINT "Overall Meaningful Values:"
 PRINT "Delta(delta(X)): %f" $dX_tot
 PRINT "Avg(delta(Y)): %f" $avgY_tot
 #PRINT "Avg(Slope): %f" $avgSlope_tot
