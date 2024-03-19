@@ -87,24 +87,24 @@ MUL $avgY_tot $avgY_tot 0.5
 ADD $avgSlope_tot $avgSlope_right $avgSlope_left
 MUL $avgSlope_tot $avgSlope_tot 0.5
 
-PRINT "---------------------"
-PRINT "Right Side"
-PRINT "Delta(delta(X)): %f" $dX_right
-PRINT "Avg(delta(Y)): %f" $avgY_right
+#PRINT "---------------------"
+#PRINT "Right Side"
+#PRINT "Delta(delta(X)): %f" $dX_right
+#PRINT "Avg(delta(Y)): %f" $avgY_right
 #PRINT "Avg(Slope): %f" $avgSlope_right
-PRINT " "
-PRINT "---------------------"
-PRINT "Left Side"
-PRINT "Delta(delta(X)): %f" $dX_left
-PRINT "Avg(delta(Y)): %f" $avgY_left
+#PRINT " "
+#PRINT "---------------------"
+#PRINT "Left Side"
+#PRINT "Delta(delta(X)): %f" $dX_left
+#PRINT "Avg(delta(Y)): %f" $avgY_left
 #PRINT "Avg(Slope): %f" $avgSlope_left
-PRINT " "
+#PRINT " "
 PRINT "---------------------"
 PRINT "Overall Meaningful Values:"
 PRINT "Delta(delta(X)): %f" $dX_tot
 PRINT "Avg(delta(Y)): %f" $avgY_tot
 #PRINT "Avg(Slope): %f" $avgSlope_tot
-PRINT "---------------------"
+#PRINT "---------------------"
 
 
 HOME
