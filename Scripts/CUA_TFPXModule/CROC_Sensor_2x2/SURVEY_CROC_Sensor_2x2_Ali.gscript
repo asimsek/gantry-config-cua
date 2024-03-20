@@ -82,7 +82,7 @@ ADD $avgSlope_left $slope_tl $slope_bl
 MUL $avgSlope_left $avgSlope_left 0.5
 
 SUB $dX_tot $dX_right $dX_left
-ADD $avgY_tot avgY_right avgY_left
+ADD $avgY_tot $avgY_right $avgY_left
 MUL $avgY_tot $avgY_tot 0.5
 ADD $avgSlope_tot $avgSlope_right $avgSlope_left
 MUL $avgSlope_tot $avgSlope_tot 0.5
