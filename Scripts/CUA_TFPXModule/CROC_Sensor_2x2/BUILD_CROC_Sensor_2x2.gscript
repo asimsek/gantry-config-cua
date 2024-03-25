@@ -22,7 +22,7 @@ VERSION v2.5
 # 12. Export the variables
 # 13. End program with vacuums on or off
 
-# Initialize the system
+  # Initialize the system
 LOADCONFIG
 HOME
 SETVAC gantry_head_inner 0
@@ -39,27 +39,28 @@ SETVAC croc2x2_weight_3 0
 SETVAC croc2x2_weight_4 0
 SETERRORMODE prompt
 
-# Rough position of the top-right bond pad on the CROC HDI (LaunchHDI)
+  # Rough position of the top-right bond pad on the CROC HDI (LaunchHDI)
 FLEXREAD $pos_croc2x2_hdi_TR siteGeometry.pos_croc2x2_hdi_TR
 
-# Rough position of the top right corner of the Sensor ROC (LaunchROC)
+  # Rough position of the top right corner of the Sensor ROC (LaunchROC)
 FLEXREAD $pos_croc2x2_TR siteGeometry.pos_croc2x2LaunchROC_TR
 
-# Dimensions of the HDI and the Sensor ROC
+  # Dimensions of the HDI and the Sensor ROC
 FLEXREAD $thickness_croc2x2HDI geometry.TFPX_CROC2X2_HDI.thickness
 FLEXREAD $thickness_sensorROC geometry.TFPX_CROC2x2_SENSORROC.thickness
 FLEXREAD $thickness_sensor geometry.TFPX_CROC2x2_SENSOR.thickness
 
-# Dimensions of bond pads of the HDI and the Sensor ROC
+  # Dimensions of bond pads of the HDI and the Sensor ROC
 FLEXREAD $dim_croc2x2_HDI geometry.TFPX_CROC2X2_HDI.fid_br
 FLEXREAD $dim_croc2x2_SENSORROC geometry.TFPX_CROC2X2_SENSORROC.fid_br
 
-# Statistical offsets
+  # Statistical offsets
 FLEXREAD $delta_sensorROC siteGeometry.delta_QUADSENSORROC
+FLEXREAD $rot_sensorROC siteGeometry.rot_QUADSENSORROC
 
-## Main Function ##
+  ## Main Function ##
 
-# Step 1. Prompt what station the assembly will occur at and take in those values
+  # Step 1. Prompt what station the assembly will occur at and take in those values
 @STEP_ONE GETINTPOPUP $station "Provide the Chuck number (0-4)"
 GOTOIF @DISPLAY_ERROR `$station<0`
 GOTOIF @DISPLAY_ERROR `$station>4`
@@ -80,20 +81,20 @@ SETVAC croc2x2_chuck_{$station}_tl 0
 ADD $pos_croc2x2_translation.z $pos_croc2x2_translation.z $thickness_croc2x2HDI
 SUB $pos_croc2x2_translation.z $pos_croc2x2_translation.z $thickness_sensorROC
 
-# Step 2. Prompt placement of HDI and turn on the HDI's vacuum
+  # Step 2. Prompt placement of HDI and turn on the HDI's vacuum
 PRINT "--------------------------"
 @STEP_TWO CHOICEPOPUP $choice "Have you placed the CROC 2x2 HDI in its correct starting location?" "Yes, continue" "No, ask me again"
 GOTOIFN @STEP_TWO $choice
 SETVAC croc2x2_launchHDI 1
 
-# Step 3. Prompt placement of appropriate weight tool on the HDI and switch on the vacuum
+  # Step 3. Prompt placement of appropriate weight tool on the HDI and switch on the vacuum
 @STEP_THREE CHOICEPOPUP $choice "Have you placed Weight Tool {$station} on the HDI?" "Yes" "No"
 GOTOIFN @STEP_THREE $choice
 SETVAC croc2x2_weight_{$station} 1
 WAIT 1000
 SETVAC croc2x2_launchHDI 0
 
-# Step 4. Move the gantry to the HDI for surveillance
+  # Step 4. Move the gantry to the HDI for surveillance
 @STEP_FOUR PASS
 MOVENAME stagingArea 100
 @HDI CHOICEPOPUP $choice "Ready to survey the HDI?" "Yes" "No, ask again"
@@ -101,13 +102,16 @@ GOTOIFN @HDI $choice
 CALL @FINDCORNERS $pos_croc2x2_hdi_TR $dim_croc2x2_HDI -> $hdi_tr $hdi_br $hdi_bl $hdi_tl
 
 
-# Step 5. Compute the would-be position and rotation of HDI on correct Chuck
+  # Step 5. Compute the would-be position and rotation of HDI on correct Chuck
 FIT $pos_croc2x2_hdi_initial $rot_croc2x2_hdi_initial $_ TFPX_CROC2X2_HDI $hdi_tr $hdi_br $hdi_bl $hdi_tl
 QUAT2EULER $rot_croc2x2_hdi_initial $trash $trash1 $rot_croc2x2_hdi_initial
 ADD $pos_croc2x2_hdi_final $pos_croc2x2_hdi_initial $pos_croc2x2_translation
 ADD $rot_croc2x2_hdi_final $rot_croc2x2_hdi_initial $rot_croc2x2_translation
 
-# Step 6. Prompt the placement of the Quad Sensor ROC
+  # Make fine adjustments to the final rotation of the CROC 2x2
+ADD $rot_croc2x2_hdi_final $rot_croc2x2_hdi_final $rot_sensorROC
+
+  # Step 6. Prompt the placement of the Quad Sensor ROC
 @STEP_SIX MOVENAME stagingArea
 SETVAC gelpak_release 1
 CHOICEPOPUP $choice "Have you placed the Quad Sensor ROC in its starting position?" "Yes, continue" "No, ask me again"
@@ -126,18 +130,18 @@ GOTOIFN @STEP_SIX_i $choice
 @STEP_SIX_ii CHOICEPOPUP $choice "Is Weight Tool {$station} ready?" "Yes, continue" "No, ask me again"
 GOTOIFN @STEP_SIX_ii $choice
 
-# Step 7. Survey the Quad Sensor ROC
+  # Step 7. Survey the Quad Sensor ROC
 @STEP_SEVEN PASS
 @QUADSENROC CHOICEPOPUP $choice "Ready to survey the Quad Sensor ROC?" "Yes" "No, ask again"
 GOTOIFN @QUADSENROC $choice
 CALL @FINDCORNERS $pos_croc2x2_TR $dim_croc2x2_SENSORROC -> $quadsenroc_tr $quadsenroc_br $quadsenroc_bl $quadsenroc_tl
 
-# Step 8. Compute the current position and rotation of QUAD Sensor ROC on LaunchROC
+  # Step 8. Compute the current position and rotation of QUAD Sensor ROC on LaunchROC
 FIT $pos_croc2x2_senroc_initial $rot_croc2x2_senroc_initial $_ TFPX_CROC2X2_SENSORROC $quadsenroc_tr $quadsenroc_br $quadsenroc_bl $quadsenroc_tl
 QUAT2EULER $rot_croc2x2_senroc_initial $trash $trash1 $rot_croc2x2_senroc_initial
 SUB $pos_croc2x2_senroc_initial.z $pos_croc2x2_senroc_initial.z $thickness_sensor
 
-# Step 9. Pick up the Quad Sensor ROC and place it at the position/rotation computed in Step 5
+  # Step 9. Pick up the Quad Sensor ROC and place it at the position/rotation computed in Step 5
 @STEP_NINE PASS
 MOVENAME tool_rack_pos_2_out 100
 LOADTOOL picker_tool
