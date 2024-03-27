@@ -77,8 +77,10 @@ SUB $dX_left $d_deltaX_tl $d_deltaX_bl
 ADD $avgY_left $d_DeltaY_tl $d_DeltaY_bl
 MUL $avgY_left $avgY_left 0.5
 
+  # Overall Opening Angle
 ADD $avgX_tot $dX_right $dX_left
 MUL $avgX_tot $avgX_tot 0.5
+  # Overall Slide
 ADD $avgY_tot $avgY_right $avgY_left
 MUL $avgY_tot $avgY_tot 0.5
 
@@ -86,7 +88,6 @@ PRINT "---------------------"
 PRINT "Overall Meaningful Values:"
 PRINT "Avg(Delta(delta(X))): %f" $avgX_tot
 PRINT "Avg(Avg(delta(Y))): %f" $avgY_tot
-
 
 HOME
 
