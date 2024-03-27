@@ -59,7 +59,6 @@ FLEXREAD $delta_sensorROC siteGeometry.delta_QUADSENSORROC
 FLEXREAD $rot_sensorROC siteGeometry.rot_QUADSENSORROC
 
   ## Main Function ##
-
   # Step 1. Prompt what station the assembly will occur at and take in those values
 @STEP_ONE GETINTPOPUP $station "Provide the Chuck number (0-4)"
 GOTOIF @DISPLAY_ERROR `$station<0`
@@ -101,7 +100,6 @@ MOVENAME stagingArea 100
 GOTOIFN @HDI $choice
 CALL @FINDCORNERS $pos_croc2x2_hdi_TR $dim_croc2x2_HDI -> $hdi_tr $hdi_br $hdi_bl $hdi_tl
 
-
   # Step 5. Compute the would-be position and rotation of HDI on correct Chuck
 FIT $pos_croc2x2_hdi_initial $rot_croc2x2_hdi_initial $_ TFPX_CROC2X2_HDI $hdi_tr $hdi_br $hdi_bl $hdi_tl
 QUAT2EULER $rot_croc2x2_hdi_initial $trash $trash1 $rot_croc2x2_hdi_initial
@@ -110,6 +108,18 @@ ADD $rot_croc2x2_hdi_final $rot_croc2x2_hdi_initial $rot_croc2x2_translation
 
   # Make fine adjustments to the final rotation of the CROC 2x2
 ADD $rot_croc2x2_hdi_final $rot_croc2x2_hdi_final $rot_sensorROC
+
+  # Make fine adjustments to the final position of the CROC 2x2 based on HDI position, rotation and delta
+COS $cos_rot_hdi $rot_croc2x2_hdi_final
+SIN $sin_rot_hdi $rot_croc2x2_hdi_final
+MUL $delta_x_y $delta_sensorROC.y $sin_rot_hdi
+MUL $delta_x_x $delta_sensorROC.x $cos_rot_hdi
+ADD $delta_x $delta_x_y $delta_x_x
+MUL $delta_y_y $delta_sensorROC.y $cos_rot_hdi
+MUL $delta_y_y $delta_y_y -1
+MUL $delta_y_x $delta_sensorROC.x $sin_rot_hdi
+ADD $delta_y $delta_y_x $delta_y_y
+ADD $pos_croc2x2_hdi_final $pos_croc2x2_hdi_final {$delta_x,$delta_y,0}
 
   # Step 6. Prompt the placement of the Quad Sensor ROC
 @STEP_SIX MOVENAME stagingArea
@@ -159,18 +169,6 @@ ROTATETO 0 10
 MOVENAME tool_rack_pos_2_out 100
 UNLOADTOOL
 GOTO @STEP_SIX
-
-  # Make fine adjustments to the final position of the CROC 2x2 based on HDI position, rotation and delta
-COS $cos_rot_hdi $rot_croc2x2_hdi_final
-SIN $sin_rot_hdi $rot_croc2x2_hdi_final
-MUL $delta_x_y $delta_sensorROC.y $sin_rot_hdi
-MUL $delta_x_x $delta_sensorROC.x $cos_rot_hdi
-ADD $delta_x $delta_x_y $delta_x_x
-MUL $delta_y_y $delta_sensorROC.y $cos_rot_hdi
-MUL $delta_y_y $delta_y_y -1
-MUL $delta_y_x $delta_sensorROC.x $sin_rot_hdi
-ADD $delta_y $delta_y_x $delta_y_y
-ADD $pos_croc2x2_hdi_final $pos_croc2x2_hdi_final {$delta_x,$delta_y,0}
 
   # Place Step #
 @PLACESTEP PASS
