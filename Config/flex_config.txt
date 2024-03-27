@@ -392,8 +392,8 @@ siteGeometry.delta_croc2x2_bl: {0.0200,0.1,0}
 siteGeometry.delta_croc2x2_tl: {0.2095,0.1,0}
 
  # Fine Correction for the Quad Sensor ROC Script
-siteGeometry.delta_QUADSENSORROC: {0,0,0} ## For slide (Avg(deltaY))
-siteGeometry.rot_QUADSENSORROC: -0.08 ## For opening angle (delta(deltaX))
+siteGeometry.delta_QUADSENSORROC: {0,0,0} ## For slide Avg(Avg(delta(Y))
+siteGeometry.rot_QUADSENSORROC: -0.08 ## For opening angle Avg(delta(delta(X))
 
  # Fine correction for the ROCs to align bond pads with HDI bond pads
 siteGeometry.delta_ROC: {0,0,0} # {width, length, 0}
