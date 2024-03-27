@@ -79,7 +79,7 @@ ADD $avgY_left $d_DeltaY_tl $d_DeltaY_bl
 MUL $avgY_left $avgY_left 0.5
 
   # Overall Opening Angle
-ADD $avgX_tot $dX_right $dX_left
+SUB $avgX_tot $dX_right $dX_left
 MUL $avgX_tot $avgX_tot 0.5
   # Overall Slide
 ADD $avgY_tot $avgY_right $avgY_left
