@@ -69,10 +69,11 @@ CALL @SURVEYCALC $hdi_br $hdi_tr $roc_br -> $d_deltaX_br $d_DeltaY_br
 CALL @SURVEYCALC $hdi_bl $hdi_tl $roc_bl -> $d_deltaX_bl $d_DeltaY_bl
 CALL @SURVEYCALC $hdi_tl $hdi_bl $roc_tl -> $d_deltaX_tl $d_DeltaY_tl
 
+  # Right-Side Accuracy
 SUB $dX_right $d_deltaX_tr $d_deltaX_br
 ADD $avgY_right $d_DeltaY_tr $d_DeltaY_br
 MUL $avgY_right $avgY_right 0.5
-
+  # Left-Side Accuracy
 SUB $dX_left $d_deltaX_tl $d_deltaX_bl
 ADD $avgY_left $d_DeltaY_tl $d_DeltaY_bl
 MUL $avgY_left $avgY_left 0.5
