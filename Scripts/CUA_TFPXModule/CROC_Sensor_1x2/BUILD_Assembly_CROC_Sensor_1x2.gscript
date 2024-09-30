@@ -58,9 +58,9 @@ COPY $rotate_tool 0
 ## Main Function ##
 
 # Step 1. Prompt what station the assembly will occur at and take in those values
-@STEP_ONE GETINTPOPUP $station "Which Station should the CROCSensor be assembled on? (0-3)"
+@STEP_ONE GETINTPOPUP $station "Which Station should the CROCSensor be assembled on? (0-4)"
 GOTOIF @DISPLAY_ERROR `$station<0`
-GOTOIF @DISPLAY_ERROR `$station>3`
+GOTOIF @DISPLAY_ERROR `$station>4`
 GOTO @FLEXREADING
 @DISPLAY_ERROR CHOICEPOPUP $trash "Bad number. Try again." "Sorry" "My bad"
 GOTO @STEP_ONE
