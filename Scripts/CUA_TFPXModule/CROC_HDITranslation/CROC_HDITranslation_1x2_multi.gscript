@@ -1,0 +1,219 @@
+VERSION v2.5
+######################## CROC 1x2 HDI Translation #############################
+# Ali Eren SIMSEK, simsek@cua.edu
+# Catholic University of America
+# March 2024
+# -----------------------------------------------------
+# Steps:
+# 1. Prompt what station the assembly will occur at and take in those values
+# 2. Prompt placement of HDI and turn on the HDI's vacuum
+# 3. Transfer vacuum from below the HDI to the HDI Weight Tool
+# 4. Move the gantry to the HDI for surveillance
+# 5. Prompt placement of HDI Weight Tool onto Assembly Chuck
+# 6. Move gantry head to the module and survey for accuracy
+# 7. Calculate a two points and rotations from the initial and final bond pad locations
+# 8. End program with vacuums on or off
+
+
+#Initialize the system
+LOADCONFIG
+HOME
+SETERRORMODE prompt
+
+  #Rough positions of the top bond pad on the CROC HDI
+FLEXREAD $pos_croc_hdi_top1 siteGeometry.pos_croc_hdi_top1
+FLEXREAD $dist_top2bot geometry.TFPX_CROC_HDI.dist_top2bot
+
+  #### Step 1. Prompt what station the assembly will occur at and take in those values
+@STEP_ONE GETINTPOPUP $station "Provide the Chuck number (0-4)"
+GOTOIF @DISPLAY_ERROR `$station<0`
+GOTOIF @DISPLAY_ERROR `$station>4`
+SETLOG "LOG_BUILD_CROC_1x2_station_{$station}.txt"
+GOTO @FLEXREADING
+@DISPLAY_ERROR CHOICEPOPUP $trash "You gave me a bad number >:(" "Sorry" "My bad"
+GOTO @STEP_ONE
+
+  # Release vacuum lines
+SETVAC gantry_head_inner 0
+SETVAC gantry_head_outer 0
+SETVAC croc1x2_launchHDI 0
+SETVAC croc1x2_weight_{$station} 0
+
+GOTOIF @SINGLEVAC1 `$station>0`
+
+SETVAC croc1x2_chuck_0_top 0
+SETVAC croc1x2_chuck_0_bot 0
+GOTO @FLEXREADING
+
+@SINGLEVAC1 PASS
+SETVAC "croc1x2_chuck_{$station}" 0
+
+
+@FLEXREADING PASS
+FLEXREAD $pos_croc_final_top1 siteGeometry.pos_final_croc1x2_hdi_tr_STAT_{$station}
+
+  #Dimensions of the HDI set of bond pads
+FLEXREAD $dim geometry.TFPX_CROC1X2_HDI.fid_br
+MUL $dim $dim {2,2,0}
+
+
+  #### Step 2. Prompt placement of HDI and turn on the HDI's vacuum
+@STEP_TWO CHOICEPOPUP $choice "Did you place the CROC 1X2 HDI on HDI Launch?" "Yes, continue" "No, ask me again"
+GOTOIFN @STEP_TWO $choice
+SETVAC croc1x2_launchHDI 1
+
+  #### Step 3. Transfer vacuum from below the HDI to the HDI Weight Tool
+@STEP_THREE CHOICEPOPUP $choice "Have you placed the HDI Weight Tool on the HDI?" "Yes, continue" "No, ask me again"
+GOTOIFN @STEP_THREE $choice
+
+SETVAC croc1x2_weight_{$station} 1
+WAIT 1000
+SETVAC croc1x2_launchHDI 0
+
+
+  #### Step 4. Move the gantry to the HDI for surveillance
+@STEP_FOUR PASS
+MOVENAME crocStaging 50
+MOVESAFE $pos_croc_hdi_top1 50
+@HDI_0 CHOICEPOPUP $choice "Ready to find a corner of the top bond pad on the HDI?" "Yes" "No"
+GOTOIFN @HDI_0 $choice
+CALL @SURVEYCORNERS $pos_croc_hdi_top1 -> $pos_croc_hdi_top1
+
+COPY $pos_croc_hdi_top2 $pos_croc_hdi_top1
+@HDI_1 CHOICEPOPUP $choice "Ready to find the opposite corner of the top bond pad on the HDI?" "Yes" "No"
+GOTOIFN @HDI_1 $choice
+CALL @SURVEYCORNERS $pos_croc_hdi_top2 -> $pos_croc_hdi_top2
+
+ADD $pos_croc_hdi_bot1 $pos_croc_hdi_top1 $dist_top2bot
+@HDI_2 CHOICEPOPUP $choice "Ready to find a corner of the bottom bond pad on the HDI?" "Yes" "No"
+GOTOIFN @HDI_2 $choice
+CALL @SURVEYCORNERS $pos_croc_hdi_bot1 -> $pos_croc_hdi_bot1
+
+COPY $pos_croc_hdi_bot2 $pos_croc_hdi_bot1
+@HDI_3 CHOICEPOPUP $choice "Ready to find the opposite corner of the top bond pad on the HDI?" "Yes" "No"
+GOTOIFN @HDI_3 $choice
+CALL @SURVEYCORNERS $pos_croc_hdi_bot2 -> $pos_croc_hdi_bot2
+
+  # Getting the center of the bond pads
+ADD $pos_croc_hdi_top $pos_croc_hdi_top1 $pos_croc_hdi_top2
+MUL $pos_croc_hdi_top $pos_croc_hdi_top {0.5,0.5,0.5}
+ADD $pos_croc_hdi_bot $pos_croc_hdi_bot1 $pos_croc_hdi_bot2
+MUL $pos_croc_hdi_bot $pos_croc_hdi_bot {0.5,0.5,0.5}
+
+MOVENAME crocStaging 50
+
+
+  #### Step 5. Prompt placement of HDI Weight Tool onto Assembly Chuck
+@STEP_FIVE CHOICEPOPUP $choice "Did you place the HDI on Assembly Chuck {$station}?" "Yes, continue" "No, ask me again"
+GOTOIFN @STEP_FIVE $choice
+
+GOTOIF @SINGLEVAC2 `$station>0`
+
+SETVAC croc1x2_chuck_0_top 1
+SETVAC croc1x2_chuck_0_bot 1
+GOTO @STEPVAC2
+
+@SINGLEVAC2 PASS
+SETVAC "croc1x2_chuck_{$station}" 1
+
+@STEPVAC2 PASS
+WAIT 1000
+
+
+  #### Step 6. Move gantry head to the module and survey for accuracy
+@STEP_SIX PASS
+MOVESAFE $pos_croc_final_top1 50
+@SURVEY_0 CHOICEPOPUP $choice "Ready to find a corner of the top bond pad on the HDI?" "Yes" "No"
+GOTOIFN @SURVEY_0 $choice
+CALL @SURVEYCORNERS $pos_croc_final_top1 -> $pos_croc_final_top1
+
+COPY $pos_croc_final_top2 $pos_croc_final_top1
+@SURVEY_1 CHOICEPOPUP $choice "Ready to find the opposite corner of the top bond pad on the HDI?" "Yes" "No"
+GOTOIFN @SURVEY_1 $choice
+CALL @SURVEYCORNERS $pos_croc_final_top2 -> $pos_croc_final_top2
+
+ADD $pos_croc_final_bot1 $pos_croc_final_top1 $dist_top2bot
+@SURVEY_2 CHOICEPOPUP $choice "Ready to find a corner of the bottom bond pad on the HDI?" "Yes" "No"
+GOTOIFN @SURVEY_2 $choice
+CALL @SURVEYCORNERS $pos_croc_final_bot1 -> $pos_croc_final_bot1
+
+COPY $pos_croc_final_bot2 $pos_croc_final_bot1
+@SURVEY_3 CHOICEPOPUP $choice "Ready to find the opposite corner of the top bond pad on the HDI?" "Yes" "No"
+GOTOIFN @SURVEY_3 $choice
+CALL @SURVEYCORNERS $pos_croc_final_bot2 -> $pos_croc_final_bot2
+
+  # Getting the center of the bond pads
+ADD $pos_croc_final_top $pos_croc_final_top1 $pos_croc_final_top2
+MUL $pos_croc_final_top $pos_croc_final_top {0.5,0.5,0.5}
+ADD $pos_croc_final_bot $pos_croc_final_bot1 $pos_croc_final_bot2
+MUL $pos_croc_final_bot $pos_croc_final_bot {0.5,0.5,0.5}
+
+
+  #### Step 7. Calculate a two points and rotations from the initial and final bond pad locations
+@STEP_SEVEN PASS
+  #Initial position calculations
+CALL @CALCPOSANDROT $pos_croc_hdi_top $pos_croc_hdi_bot -> $initial_pos $initial_rot
+  #Final position calculations
+CALL @CALCPOSANDROT $pos_croc_final_top $pos_croc_final_bot -> $final_pos $final_rot
+
+  #Calculate the vector from initial -> final
+SUB $vect_translation $final_pos $initial_pos
+SUB $rot_translation $final_rot $initial_rot
+
+  #Print out the data
+PRINT "HDI Translation Vector: %v" $vect_translation
+PRINT "HDI Translation Rotation: %f" $rot_translation
+
+
+  #### Step 8. End program with vacuums on or off
+@STEP_EIGHT PASS
+CHOICEPOPUP $choice "Do you want to leave the vacuums on?" "Yes, Leave them on" "No, Turn them off"
+GOTOIF @STEP_END $choice
+
+SETVAC croc1x2_weight_{$station} 0
+
+GOTOIF @SINGLEVAC3 `$station>0`
+
+SETVAC croc1x2_chuck_0_top 0
+SETVAC croc1x2_chuck_0_bot 0
+GOTO @STEP_END
+
+@SINGLEVAC3 PASS
+SETVAC "croc1x2_chuck_{$station}" 0
+
+@STEP_END HOME
+END
+
+
+
+# SURVEYCORNERS
+# Arguments:
+# $x_corner - Approximate position of an object that you would like to know the precise position. Returns with precise position written in this location
+#
+# Returns:
+# $x_corner - Updated position of the corner that is being looked for
+@SURVEYCORNERS(x_corner)
+  MOVESAFE $x_corner 50
+  @SURCORNPOP VIDEO
+  CHOICEPOPUP $choice "Did you correctly align the cursor with the marker?" "Yes" "No"
+  GOTOIFN @SURCORNPOP $choice
+  GETPOS $x_corner
+  RETURN $x_corner
+
+# CALCPOSANDROT
+# Arguments:
+# $top_pos - position of the center of the top hdi bond pad
+# $bot_pos - position of the center of the bottom hdi bond pad
+#
+# Returns:
+# $pos - the center position between the two points
+# $rot - the rotation of the hdi (knowing the gantry's rotational system)
+@CALCPOSANDROT(top_pos,bot_pos)
+  ADD $pos $top_pos $bot_pos
+  MUL $pos $pos {0.5,0.5,0.5}
+
+  SUB $x_input $bot_pos.y $top_pos.y
+  SUB $y_input $top_pos.x $bot_pos.x
+  ATAN2 $rot $x_input $y_input
+
+  RETURN $pos $rot
