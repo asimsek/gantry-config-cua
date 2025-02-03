@@ -19,7 +19,7 @@ light.gantryhead.hardware_address: Y.0
 #================================================
 
 
-# Vacuum line16 is unknown (so far)
+# Vacuum line16 and line 17 is unknown (so far)
 vacuum.gantry_head_outer:    0
 vacuum.gantry_head_inner:    2
 vacuum.gelpak_release: 30
@@ -38,24 +38,43 @@ vacuum.gelpak_release: 30
 ##################################
 
 ########### CROC 1x2 ###########
-vacuum.croc_chuck_1_top: 13
-vacuum.croc_chuck_0_top: 13
-vacuum.croc_chuck_1_bot: 14
-vacuum.croc_chuck_0_bot: 14
-vacuum.croc_chuck_2_top: 5
+vacuum.croc1x2_launchHDI: 15
+vacuum.croc1x2_launchROC_top: 5
+vacuum.croc1x2_launchROC_bot: 9
 
-vacuum.croc_launchROC_top: 5
-vacuum.croc_chuck_2_bot: 9
-vacuum.croc_launchROC_bot: 9
-vacuum.croc_chuck_3: 15
+vacuum.croc1x2_chuck_0_top: 13
+vacuum.croc1x2_chuck_0_bot: 14
+
+vacuum.croc1x2_chuck_0: 13
+vacuum.croc1x2_chuck_1: 31
+vacuum.croc1x2_chuck_2: 29
+vacuum.croc1x2_chuck_3: 25
+vacuum.croc1x2_chuck_4: 24
+
+vacuum.croc1x2_weight_0: 7
+vacuum.croc1x2_weight_1: 7
+vacuum.croc1x2_weight_2: 7
+vacuum.croc1x2_weight_3: 7
+vacuum.croc1x2_weight_4: 7
+
+
+
+######### Old
 vacuum.croc_launchHDI: 15
+vacuum.croc_launchROC_top: 5
+vacuum.croc_launchROC_bot: 9
+vacuum.croc_chuck_0_top: 13
+vacuum.croc_chuck_0_bot: 14
+vacuum.croc_chuck_1_top: 13
+vacuum.croc_chuck_1_bot: 14
+vacuum.croc_chuck_2_top: 5
+vacuum.croc_chuck_2_bot: 9
+vacuum.croc_chuck_3: 15
 vacuum.croc_hdipicker: 7
 vacuum.croc_weight_0: 7
-vacuum.croc2x2_weight_0: 27
-vacuum.croc2x2_weight_1: 27
-vacuum.croc2x2_weight_2: 27
-vacuum.croc2x2_weight_3: 27
-vacuum.croc2x2_weight_4: 27
+
+
+
 
 ########### CROC 2x2 ###########
 vacuum.croc2x2_launchHDI: 10
@@ -67,11 +86,18 @@ vacuum.croc2x2_chuck_0_tr: 28
 vacuum.croc2x2_chuck_0_br: 6
 vacuum.croc2x2_chuck_0_bl: 11
 vacuum.croc2x2_chuck_0_tl: 12
+
 vacuum.croc2x2_chuck_1: 21
 vacuum.croc2x2_chuck_2: 20
 vacuum.croc2x2_chuck_3: 18
-vacuum.croc2x2_chuck_4: 19 #RELABEL
-vacuum.croc2x2_chuck_0: 28 #RELABEL
+vacuum.croc2x2_chuck_4: 23
+vacuum.croc2x2_chuck_0: 28
+
+vacuum.croc2x2_weight_0: 27
+vacuum.croc2x2_weight_1: 22
+vacuum.croc2x2_weight_2: 22
+vacuum.croc2x2_weight_3: 22
+vacuum.croc2x2_weight_4: 22
 
 #### From Purdue
 # vacuum.module_chuck_0_slot_1: 24
@@ -90,38 +116,40 @@ vacuum.purdue_mechanics_right: 13
 
 
 manifold.reset_on_start: false
-manifold.port.00: cDAQ1Mod6/port0/line0
-manifold.port.01: cDAQ1Mod6/port0/line1
-manifold.port.02: cDAQ1Mod6/port0/line2
-manifold.port.03: cDAQ1Mod6/port0/line3
-manifold.port.04: cDAQ1Mod6/port0/line4
-manifold.port.05: cDAQ1Mod6/port0/line5
-manifold.port.06: cDAQ1Mod6/port0/line6
-manifold.port.07: cDAQ1Mod6/port0/line7
-manifold.port.08: cDAQ1Mod6/port0/line8
-manifold.port.09: cDAQ1Mod6/port0/line9
-manifold.port.10: cDAQ1Mod6/port0/line10
-manifold.port.11: cDAQ1Mod6/port0/line11
-manifold.port.12: cDAQ1Mod6/port0/line12
-manifold.port.13: cDAQ1Mod6/port0/line13
-manifold.port.14: cDAQ1Mod6/port0/line14
-manifold.port.15: cDAQ1Mod6/port0/line15
-manifold.port.16: cDAQ1Mod6/port0/line16
-manifold.port.17: cDAQ1Mod6/port0/line17
-manifold.port.18: cDAQ1Mod6/port0/line18
-manifold.port.19: cDAQ1Mod6/port0/line19
-manifold.port.20: cDAQ1Mod6/port0/line20
-manifold.port.21: cDAQ1Mod6/port0/line21
-manifold.port.22: cDAQ1Mod6/port0/line22
-manifold.port.23: cDAQ1Mod6/port0/line23
-manifold.port.24: cDAQ1Mod6/port0/line24
-manifold.port.25: cDAQ1Mod6/port0/line25
-manifold.port.26: cDAQ1Mod6/port0/line26
-manifold.port.27: cDAQ1Mod6/port0/line27
-manifold.port.28: cDAQ1Mod6/port0/line28
-manifold.port.29: cDAQ1Mod6/port0/line29
-manifold.port.30: cDAQ1Mod6/port0/line30
-manifold.port.31: cDAQ1Mod6/port0/line31
+manifold.port.00: cDAQ1Mod6/port0/line0 ## Gantry Head Outer
+manifold.port.01: cDAQ1Mod6/port0/line1 ## GHCO Station 
+manifold.port.02: cDAQ1Mod6/port0/line2 ## Gantry Head Inner
+manifold.port.03: cDAQ1Mod6/port0/line3 ## 2x2 ROC Launch (Bottom-Left)
+manifold.port.04: cDAQ1Mod6/port0/line4 ## 2x2 ROC Launch (Top-Right)
+manifold.port.05: cDAQ1Mod6/port0/line5 ## 1x2 ROC Launch (Top)
+manifold.port.06: cDAQ1Mod6/port0/line6 ## 2x2 Assembly Chuck #0 (Bottom-Right)
+manifold.port.07: cDAQ1Mod6/port0/line7 ## 1x2 HDI Picker Tool (#0)
+manifold.port.08: cDAQ1Mod6/port0/line8 ## 2x2 ROC Launch (Bottom-Right)
+manifold.port.09: cDAQ1Mod6/port0/line9 ## 1x2 ROC Launch (Bottom)
+manifold.port.10: cDAQ1Mod6/port0/line10 ## 2x2 HDI Launch
+manifold.port.11: cDAQ1Mod6/port0/line11 ## 2x2 Assembly Chuck #0 (Bottom-Left)
+manifold.port.12: cDAQ1Mod6/port0/line12 ## 2x2 Assembly Chuck #0 (Top-Left)
+manifold.port.13: cDAQ1Mod6/port0/line13 ## 1x2 Assembly Chuck #0 (Top)
+manifold.port.14: cDAQ1Mod6/port0/line14 ## 1x2 Assembly Chuck #0 (Bottom)
+manifold.port.15: cDAQ1Mod6/port0/line15 ## 1x2 HDI Launch
+
+manifold.port.16: cDAQ1Mod6/port0/line16 ## Not Working!!
+manifold.port.17: cDAQ1Mod6/port0/line17 ## Not Working!!
+
+manifold.port.18: cDAQ1Mod6/port0/line18 ## 2x2 Assembly Chuck #3
+manifold.port.19: cDAQ1Mod6/port0/line19 ## Problematic!!
+manifold.port.20: cDAQ1Mod6/port0/line20 ## 2x2 Assembly Chuck #2
+manifold.port.21: cDAQ1Mod6/port0/line21 ## 2x2 Assembly Chuck #1
+manifold.port.22: cDAQ1Mod6/port0/line22 ## 2x2 HDI Picker Tool (#4)
+manifold.port.23: cDAQ1Mod6/port0/line23 ## 2x2 Assembly Chuck #4
+manifold.port.24: cDAQ1Mod6/port0/line24 ## 1x2 Assembly Chuck #4
+manifold.port.25: cDAQ1Mod6/port0/line25 ## 1x2 Assembly Chuck #3
+manifold.port.26: cDAQ1Mod6/port0/line26 ## 2x2 ROC Launch (Top-Left)
+manifold.port.27: cDAQ1Mod6/port0/line27 ## 2x2 HDI Picker Tool (#0)
+manifold.port.28: cDAQ1Mod6/port0/line28 ## 2x2 Assembly Chuck #0 (Top-Right)
+manifold.port.29: cDAQ1Mod6/port0/line29 ## 1x2 Assembly Chuck #2
+manifold.port.30: cDAQ1Mod6/port0/line30 ## Gelpack Release
+manifold.port.31: cDAQ1Mod6/port0/line31 ## 1x2 Assembly Chuck #1
 
 
 tool_rack.0: None
@@ -188,6 +216,11 @@ geometry.TFPX_CROC_MULTIGLASS.thickness: 0.513
 geometry.TFPX_CROC_SINGLEGLASS.thickness: 0.500
 
 geometry.TFPX_CROC_HDI.thickness: 0.290
+geometry.TFPX_CROC_HDI.dist_top2bot: {0.035826,43.080907,0.02}
+geometry.TFPX_CROC1X2_HDI.fid_tr: {8.600,-21.600,0}
+geometry.TFPX_CROC1X2_HDI.fid_tl: {-8.600,-21.600,0}
+geometry.TFPX_CROC1X2_HDI.fid_bl: {-8.600,21.600,0}
+geometry.TFPX_CROC1X2_HDI.fid_br: {8.600,21.600,0}
 
 #geometry.TFPX_CROC_DUALROC.thickness: 0.485
 geometry.TFPX_CROC_DUALROC.thickness: 0.808
@@ -236,7 +269,7 @@ geometry.TFPX_GHCOPIECE.fid_bl: {-8.600,21.600,0}
 geometry.TFPX_GHCOPIECE.fid_tl: {-8.600,-21.600,0}
 
 
-geometry.PICKER_TOOL.center_offset: {0,0,47.72} # 
+geometry.PICKER_TOOL.center_offset: {0,0,54.65} # {0,0,47.72}
 # geometry.PICKER_TOOL.center_to_suction: {0,11.084,0} # 
 
 
@@ -247,8 +280,8 @@ geometry.PICKER_TOOL.center_offset: {0,0,47.72} #
 # geometry.tool_holder_offset: {-0.3079674542,-102.2929647457,-17.2} # REFERENCE POINT # x=-679.41 µm | y=-83.76 µm
 # geometry.tool_holder_offset: {0.3714394647,-102.2092046759,-17.20} # x=7.74 µm | y=-5.02 µm
 # geometry.tool_holder_offset: {0.3636974767,-102.2041819747,-17.20} #  x=3.16 µm | y=3.67 µm
-geometry.tool_holder_offset: {0.3605405310,-102.2078507414,-17.20}   # x=3.18 µm | y=2.92 µm
-
+# geometry.tool_holder_offset: {0.3605405310,-102.2078507414,-17.20}   # x=3.18 µm | y=2.92 µm
+geometry.tool_holder_offset: {0.3605405310,-102.2078507414,-23.53} # May 30, 2024 
 
 
 #================================================
@@ -284,14 +317,34 @@ siteGeometry.pos_BLsenRoc_launch_tr: {723.571069,232.210150,62.521771}
 siteGeometry.pos_TLsenRoc_launch_tr: {723.507602,212.044947,62.369772}
 
 ###Information for the CROC HDI
-siteGeometry.pos_croc_hdi_top1: {314.793280,529.087327,93.910001}
+siteGeometry.pos_croc_hdi_top1: {315.241301,529.457358,93.859997}
 siteGeometry.pos_croc_hdi_top2: {314.842789,550.753913,93.919998}
 siteGeometry.dist_hdi_bondpads: 43.080 #mm
 siteGeometry.dist_hdi_half_bondpads: 16.803 #mm
 
-# CROC HDI pick and place translation vector and rotation angle
-## siteGeometry.croc_v_translation: {-100.3455445,-0.041407833,-6.4854225} ## GOOD 30um
-## siteGeometry.croc_rot_translation:-0.184506167 ## GOOD 14um
+siteGeometry.pos_final_croc1x2_hdi_tr_STAT_0: {214.529493,529.200332,87.503503}
+siteGeometry.pos_final_croc1x2_hdi_tr_STAT_1: {214.962780,376.995675,87.578511}
+siteGeometry.pos_final_croc1x2_hdi_tr_STAT_2: {264.765380,376.858891,87.573513}
+siteGeometry.pos_final_croc1x2_hdi_tr_STAT_3: {315.408806,377.040207,87.578508}
+siteGeometry.pos_final_croc1x2_hdi_tr_STAT_4: {365.111691,376.566258,87.503506}
+
+# CROC 1x2 HDI pick and place translation vector and rotation angle
+# CROC 1x2 Station #0
+siteGeometry.croc_v_translation_STAT_0: {-100.320443,-0.055543,-6.485292}
+siteGeometry.croc_rot_translation_STAT_0: -0.164323
+# CROC 1x2 Station #1
+siteGeometry.croc_v_translation_STAT_1: {-99.988595,-152.377117,-6.281328}
+siteGeometry.croc_rot_translation_STAT_1: -0.274865
+# CROC 1x2 Station #2
+siteGeometry.croc_v_translation_STAT_2: {-50.111459,-152.521335,-6.296488}
+siteGeometry.croc_rot_translation_STAT_2: -0.366643
+# CROC 1x2 Station #3
+siteGeometry.croc_v_translation_STAT_3: {0.182024,-152.436784,-6.303991}
+siteGeometry.croc_rot_translation_STAT_3: -0.007681
+# CROC 1x2 Station #4
+siteGeometry.croc_v_translation_STAT_4: {50.173737,-152.670020,-6.361473}
+siteGeometry.croc_rot_translation_STAT_4: -0.140869
+#########################
 
 
 ### Information for the CROC Single Glass Script
@@ -315,10 +368,7 @@ siteGeometry.delta_TOPROC: {0.0,0,0}
 siteGeometry.delta_BOTROC: {0.15,0,0}
 
 
-# CROC HDI pick and place translation vector and rotation angle
-# Station 0
-siteGeometry.croc_v_translation_STAT_0: {-100.320443,-0.055543,-6.485292}
-siteGeometry.croc_rot_translation_STAT_0: -0.164323
+
 
 # Vector from center of the bond pads on one Dual ROC to its center
 siteGeometry.dualROC_bondsToCenter: {11.828,0,0}
@@ -349,8 +399,14 @@ siteGeometry.rot_ROC_error: 0.
 ### QuadROC Information
 
 # HDI position data
-siteGeometry.pos_croc2x2_hdi_TR: {657.582514,523.521146,93.800473}
+siteGeometry.pos_croc2x2_hdi_TR: {657.620475,523.442667,93.765479}
 siteGeometry.pos_final_croc2x2_hdi_tr: {507.855616,523.426771,87.375407}
+
+siteGeometry.pos_final_croc2x2_hdi_tr_STAT_0: {507.855616,523.426771,87.375407}
+siteGeometry.pos_final_croc2x2_hdi_tr_STAT_1: {507.855616,371.122734,87.325409}
+siteGeometry.pos_final_croc2x2_hdi_tr_STAT_2: {582.683182,371.122734,87.325409}
+siteGeometry.pos_final_croc2x2_hdi_tr_STAT_3: {657.510747,371.122734,87.325409}
+siteGeometry.pos_final_croc2x2_hdi_tr_STAT_4: {732.338313,371.122734,87.325409}
 
  # QuadROC position data
 siteGeometry.pos_croc2x2LaunchROC_TR: {584.730885,522.345364,93.781025}
@@ -361,29 +417,25 @@ siteGeometry.pos_croc2x2LaunchROC_TL: {565.982649,522.120571,93.201077}
  # Vector from midpoint of bondpad edge to 
 siteGeometry.quadROC_bondsToCenter: {9.228,0,0}
 
- # Station 0 data
-siteGeometry.pos_croc2x2_translation_STAT_0: {-149.9292,-0.0164,-6.458} # FINAL Aug 01, 2023
+
+# CROC 2x2 HDI pick and place translation vector and rotation angle
+# CROC 2x2 Station #0
+siteGeometry.pos_croc2x2_translation_STAT_0: {-149.9292,-0.0164,-6.208} # FINAL Aug 01, 2023
 siteGeometry.rot_croc2x2_translation_STAT_0: -0.0500 # FINAL Aug 01, 2023
+# CROC 2x2 Station #1
+siteGeometry.croc2x2_v_translation_STAT_1: {-149.797833,-152.297388,-6.352937}
+siteGeometry.croc2x2_rot_translation_STAT_1: 0.004225
+# CROC 2x2 Station #2
+siteGeometry.croc2x2_v_translation_STAT_2: {-75.144966,-152.108945,-6.475059}
+siteGeometry.croc2x2_rot_translation_STAT_2: -0.082785
+# CROC 2x2 Station #3
+siteGeometry.croc2x2_v_translation_STAT_3: {-0.122397,-152.428617,-6.467812}
+siteGeometry.croc2x2_rot_translation_STAT_3: 0.098511
+# CROC 2x2 Station #4
+siteGeometry.croc2x2_v_translation_STAT_4: {74.733409,-152.311898,-6.411475}
+siteGeometry.croc2x2_rot_translation_STAT_4: -0.039683
 
 ### Quad Sensor ROC Information
-
- # HDI position data
-
- # Station 1 data
-siteGeometry.croc2x2_v_translation_STAT_1: {-150.750,-150.769,-6.338} #REMEASURE
-siteGeometry.croc2x2_rot_translation_STAT_1: 0 #REMEASURE
-
- # Station 2 data
-siteGeometry.croc2x2_v_translation_STAT_2: {-75.965,-150.760,-6.283} #REMEASURE
-siteGeometry.croc2x2_rot_translation_STAT_2: 0 #REMEASURE
-
- # Station 3 data
-siteGeometry.croc2x2_v_translation_STAT_3: {-1.436,-150.760,-6.063} #REMEASURE
-siteGeometry.croc2x2_rot_translation_STAT_3: 0 #REMEASURE
-
- # Station 4 data
-siteGeometry.croc2x2_v_translation_STAT_4: {74.254,-148.955,-6.079} #REMEASURE
-siteGeometry.croc2x2_rot_translation_STAT_4: 0 #REMEASURE
 
  # Fine Correction for the Quad ROC Script
 siteGeometry.delta_croc2x2_tr: {0.0530,0.1,0}
