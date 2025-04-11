@@ -18,33 +18,33 @@ SETVAC croc_chuck_0_top 0
 #  These are determined from the Initial_Gantry_Survey script
 #  Ideally, they should be read from the flex-config file
 #
-COPY $bolt_hole_origin {-83.365090,625.414110,92.520000}
-COPY $top_pin_1x2_hdi_launch {170.018828,516.864208,64.280000}
-COPY $top_pin_2x2_hdi_launch {639.829443,512.336249,63.274999}
+FLEXREAD $bolt_hole_origin siteGeometry.bolt_hole_origin
+FLEXREAD $top_pin_1x2_hdi_launch siteGeometry.top_pin_1x2_hdi_launch
+FLEXREAD $top_pin_2x2_hdi_launch siteGeometry.top_pin_2x2_hdi_launch
 
-COPY $focus_1x2_hdi_launch 73.470000
-COPY $focus_1x2_chip_launch 73.470000
-COPY $focus_1x2_chuck_0 67.120000
-COPY $focus_1x2_chuck_1 67.074999
-COPY $focus_1x2_chuck_2 67.090000
-COPY $focus_1x2_chuck_3 67.085000
-COPY $focus_1x2_chuck_4 67.100000
-COPY $focus_2x2_hdi_launch 73.585000
-COPY $focus_2x2_chip_launch 73.510000
-COPY $focus_2x2_chuck_0 67.110000
-COPY $focus_2x2_chuck_1 67.200001
-COPY $focus_2x2_chuck_2 67.244999
-COPY $focus_2x2_chuck_3 67.340000
-COPY $focus_2x2_chuck_4 67.440000
+FLEXREAD $focus_1x2_hdi_launch siteGeometry.focus_1x2_hdi_launch 
+FLEXREAD $focus_1x2_chip_launch siteGeometry.focus_1x2_chip_launch 
+FLEXREAD $focus_1x2_chuck_0 siteGeometry.focus_1x2_chuck_0 
+FLEXREAD $focus_1x2_chuck_1 siteGeometry.focus_1x2_chuck_1 
+FLEXREAD $focus_1x2_chuck_2 siteGeometry.focus_1x2_chuck_2 
+FLEXREAD $focus_1x2_chuck_3 siteGeometry.focus_1x2_chuck_3 
+FLEXREAD $focus_1x2_chuck_4 siteGeometry.focus_1x2_chuck_4 
+FLEXREAD $focus_2x2_hdi_launch siteGeometry.focus_2x2_hdi_launch 
+FLEXREAD $focus_2x2_chip_launch siteGeometry.focus_2x2_chip_launch 
+FLEXREAD $focus_2x2_chuck_0 siteGeometry.focus_2x2_chuck_0 
+FLEXREAD $focus_2x2_chuck_1 siteGeometry.focus_2x2_chuck_1 
+FLEXREAD $focus_2x2_chuck_2 siteGeometry.focus_2x2_chuck_2 
+FLEXREAD $focus_2x2_chuck_3 siteGeometry.focus_2x2_chuck_3 
+FLEXREAD $focus_2x2_chuck_4 siteGeometry.focus_2x2_chuck_4
 
 # This is with the terrible black suction cups
 # COPY $initial_ghco {0.816264,101.843457,-6.931915}
 
 # This is with the excellent white suction cups
-COPY $initial_ghco {0.836778,101.910113,-3.984000}
+FLEXREAD $initial_ghco siteGeometry.initial_ghco
 
-COPY $drop_correction {-0.010613,0.010916,0.000000}
-COPY $drop_rotation -0.019972
+FLEXREAD $drop_correction siteGeometry.drop_correction
+FLEXREAD $drop_rotation siteGeometry.drop_rotation
 
 COPY $offset_chuck_0 {-50.000,5.000,0.000}              # offset from pickup point
 COPY $fiducial_dy 21.350
@@ -59,8 +59,8 @@ COPY $fiducial_2 {-8.600,10.675,0.000}
 COPY $fiducial_3 {8.600,-10.675,0.000}
 COPY $fiducial_4 {8.600,10.675,0.000}
 
-COPY $initial_rot 1.5
-COPY $initial_loc {-49.062876,17.061214,-0.500}      # Relative to HDI launch pad
+FLEXREAD $initial_rot siteGeometry.initial_ghco_rot
+FLEXREAD $initial_loc siteGeometry.initial_ghco_fid_loc     # Relative to HDI launch pad 
 COPY $abs_loc {$top_pin_1x2_hdi_launch.x,$top_pin_1x2_hdi_launch.y,$focus_1x2_hdi_launch}
 ADD $abs_loc $abs_loc $initial_loc
 

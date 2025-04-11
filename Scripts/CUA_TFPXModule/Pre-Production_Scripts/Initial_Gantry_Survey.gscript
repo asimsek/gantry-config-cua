@@ -14,24 +14,24 @@ PRINT "Initial_Gantry_Survey v1.00 running..."
 #  only used for comparison with new values determined by this script.
 #
 
-COPY $bolt_hole_origin {-83.365090,625.414110,92.520000}
-COPY $top_pin_1x2_hdi_launch {170.018828,516.864208,64.280000}
-COPY $top_pin_2x2_hdi_launch {639.829443,512.336249,63.274999}
+FLEXREAD $bolt_hole_origin siteGeometry.bolt_hole_origin
+FLEXREAD $top_pin_1x2_hdi_launch siteGeometry.top_pin_1x2_hdi_launch
+FLEXREAD $top_pin_2x2_hdi_launch siteGeometry.top_pin_2x2_hdi_launch
 
-COPY $focus_1x2_hdi_launch 73.470000
-COPY $focus_1x2_chip_launch 73.470000
-COPY $focus_1x2_chuck_0 67.120000
-COPY $focus_1x2_chuck_1 67.074999
-COPY $focus_1x2_chuck_2 67.090000
-COPY $focus_1x2_chuck_3 67.085000
-COPY $focus_1x2_chuck_4 67.100000
-COPY $focus_2x2_hdi_launch 73.585000
-COPY $focus_2x2_chip_launch 73.510000
-COPY $focus_2x2_chuck_0 67.110000
-COPY $focus_2x2_chuck_1 67.200001
-COPY $focus_2x2_chuck_2 67.244999
-COPY $focus_2x2_chuck_3 67.340000
-COPY $focus_2x2_chuck_4 67.440000
+FLEXREAD $focus_1x2_hdi_launch siteGeometry.focus_1x2_hdi_launch 
+FLEXREAD $focus_1x2_chip_launch siteGeometry.focus_1x2_chip_launch 
+FLEXREAD $focus_1x2_chuck_0 siteGeometry.focus_1x2_chuck_0 
+FLEXREAD $focus_1x2_chuck_1 siteGeometry.focus_1x2_chuck_1 
+FLEXREAD $focus_1x2_chuck_2 siteGeometry.focus_1x2_chuck_2 
+FLEXREAD $focus_1x2_chuck_3 siteGeometry.focus_1x2_chuck_3 
+FLEXREAD $focus_1x2_chuck_4 siteGeometry.focus_1x2_chuck_4 
+FLEXREAD $focus_2x2_hdi_launch siteGeometry.focus_2x2_hdi_launch 
+FLEXREAD $focus_2x2_chip_launch siteGeometry.focus_2x2_chip_launch 
+FLEXREAD $focus_2x2_chuck_0 siteGeometry.focus_2x2_chuck_0 
+FLEXREAD $focus_2x2_chuck_1 siteGeometry.focus_2x2_chuck_1 
+FLEXREAD $focus_2x2_chuck_2 siteGeometry.focus_2x2_chuck_2 
+FLEXREAD $focus_2x2_chuck_3 siteGeometry.focus_2x2_chuck_3 
+FLEXREAD $focus_2x2_chuck_4 siteGeometry.focus_2x2_chuck_4 
 
 #
 #  Nominal values are calculated from the design geometry

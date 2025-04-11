@@ -19,26 +19,18 @@ COPY $pin_hole_radius 1.10
 #  These are determined from the Initial_Gantry_Survey script
 #  They should be read from the flex-config file
 #
-COPY $bolt_hole_origin {-83.365090,625.414110,92.520000}
+FLEXREAD $bolt_hole_origin siteGeometry.bolt_hole_origin
+FLEXREAD $top_pin_2x2_hdi_launch siteGeometry.top_pin_2x2_hdi_launch
+FLEXREAD $bottom_pin_2x2_hdi_launch siteGeometry.bottom_pin_2x2_hdi_launch
+FLEXREAD $theta_2x2_hdi_launch siteGeometry.theta_2x2_hdi_launch
 
-COPY $top_pin_2x2_hdi_launch {639.831416,512.336633,63.295000}
-COPY $bottom_pin_2x2_hdi_launch {639.6579879,587.366970,63.222000}
-COPY $theta_2x2_hdi_launch 0.115719
-
-COPY $focus_1x2_hdi_launch 73.470000
-COPY $focus_1x2_chip_launch 73.470000
-COPY $focus_1x2_chuck_0 67.120000
-COPY $focus_1x2_chuck_1 67.074999
-COPY $focus_1x2_chuck_2 67.090000
-COPY $focus_1x2_chuck_3 67.085000
-COPY $focus_1x2_chuck_4 67.100000
-COPY $focus_2x2_hdi_launch 73.585000
-COPY $focus_2x2_chip_launch 73.510000
-COPY $focus_2x2_chuck_0 67.110000
-COPY $focus_2x2_chuck_1 67.200001
-COPY $focus_2x2_chuck_2 67.244999
-COPY $focus_2x2_chuck_3 67.340000
-COPY $focus_2x2_chuck_4 67.440000
+FLEXREAD $focus_2x2_hdi_launch siteGeometry.focus_2x2_hdi_launch
+FLEXREAD $focus_2x2_chip_launch siteGeometry.focus_2x2_chip_launch
+FLEXREAD $focus_2x2_chuck_0 siteGeometry.focus_2x2_chuck_0
+FLEXREAD $focus_2x2_chuck_1 siteGeometry.focus_2x2_chuck_1
+FLEXREAD $focus_2x2_chuck_2 siteGeometry.focus_2x2_chuck_2
+FLEXREAD $focus_2x2_chuck_3 siteGeometry.focus_2x2_chuck_3
+FLEXREAD $focus_2x2_chuck_4 siteGeometry.focus_2x2_chuck_4
 
 #
 #  Nominal chuck offset positions
@@ -53,8 +45,6 @@ COPY $bottom_pin_offset {0.000,75.000,0.000}
 #
 #  Calculate nominal position of bottom pin if you do not already know it.
 #
-# ADD $bottom_pin_2x2_hdi_launch $top_pin_2x2_hdi_launch $bottom_pin_offset
-# COPY $theta_2x2_hdi_launch 0.000000
 
 ADD $top_pin_chuck_0 $top_pin_2x2_hdi_launch $chuck_offset_0
 ADD $bottom_pin_chuck_0 $bottom_pin_2x2_hdi_launch $chuck_offset_0
@@ -80,25 +70,26 @@ COPY $theta_chuck_4 0.000000
 #  These are determined from this script.
 #  They are used in subsequent scripts, but not this one.
 #
-COPY $top_pin_chuck_0 {490.186853,511.794159,60.785998}
-COPY $bottom_pin_chuck_0 {490.209731,586.774444,60.448998}
-COPY $theta_chuck_0 -0.133200
+#FLEXREAD $top_pin_chuck_0 siteGeometry.top_pin_2x2_chuck_0
+#FLEXREAD $bottom_pin_chuck_0 siteGeometry.bottom_pin_2x2_chuck_0
+#FLEXREAD $theta_chuck_0 siteGeometry.theta_2x2_chuck_0
 
-COPY $top_pin_chuck_1 {490.421774,359.816105,61.431998}
-COPY $bottom_pin_chuck_1 {490.265913,434.823138,61.233998}
-COPY $theta_chuck_1 0.005018
+#FLEXREAD $top_pin_chuck_1 siteGeometry.top_pin_2x2_chuck_1
+#FLEXREAD $bottom_pin_chuck_1 siteGeometry.bottom_pin_2x2_chuck_1
+#FLEXREAD $theta_chuck_1 siteGeometry.theta_2x2_chuck_1
 
-COPY $top_pin_chuck_2 {565.091122,359.650459,61.311998}
-COPY $bottom_pin_chuck_2 {565.097347,434.584713,61.296998}
-COPY $theta_chuck_2 -0.118799
+#FLEXREAD $top_pin_chuck_2 siteGeometry.top_pin_2x2_chuck_2
+#FLEXREAD $bottom_pin_chuck_2 siteGeometry.bottom_pin_2x2_chuck_2
+#FLEXREAD $theta_chuck_2 siteGeometry.theta_2x2_chuck_2
 
-COPY $top_pin_chuck_3 {639.902254,360.061791,61.395998}
-COPY $bottom_pin_chuck_3 {639.917396,435.048464,61.435998}
-COPY $theta_chuck_3 -0.125609
+#FLEXREAD $top_pin_chuck_3 siteGeometry.top_pin_2x2_chuck_3
+#FLEXREAD $bottom_pin_chuck_3 siteGeometry.bottom_pin_2x2_chuck_3
+#FLEXREAD $theta_chuck_3 siteGeometry.theta_2x2_chuck_3
 
-COPY $top_pin_chuck_4 {714.717145,360.144413,61.508998}
-COPY $bottom_pin_chuck_4 {714.579482,435.038551,61.544998}
-COPY $theta_chuck_4 -0.008723
+#FLEXREAD $top_pin_chuck_4 siteGeometry.top_pin_2x2_chuck_4
+#FLEXREAD $bottom_pin_chuck_4 siteGeometry.bottom_pin_2x2_chuck_4
+#FLEXREAD $theta_chuck_4 siteGeometry.theta_2x2_chuck_4
+
 
 COPY $safe_z 10.000
 

@@ -623,3 +623,138 @@ potting.sylgard.tip_height: 0.180
 # Height of the needle as it moves between pot-lines. Must be high enough to clear
 # any obstacles on the module.
 potting.sylgard.safe_height_offset: 5 # mm
+
+
+
+
+###########################################
+######### Gantry Origin Parameters ########
+###########################################
+
+siteGeometry.bolt_hole_origin: {-83.583703,626.742818,86.445005}
+
+########################################
+#### 1x2 CROC assembly station: [z-axis/camera-focus]
+########################################
+siteGeometry.focus_1x2_hdi_launch: 67.232444 #mm
+siteGeometry.focus_1x2_chip_launch: 67.302963 #mm
+siteGeometry.focus_1x2_chuck_0: 60.862898 #mm
+siteGeometry.focus_1x2_chuck_1: 60.912012 #mm
+siteGeometry.focus_1x2_chuck_2: 60.890177 #mm
+siteGeometry.focus_1x2_chuck_3: 60.845844 #mm
+siteGeometry.focus_1x2_chuck_4: 60.826478 #mm
+
+########################################
+#### 2x2 CROC assembly station: [z-axis/camera-focus]
+########################################
+siteGeometry.focus_2x2_hdi_launch: 67.072532 #mm
+siteGeometry.focus_2x2_chip_launch: 67.020971 #mm
+siteGeometry.focus_2x2_chuck_0: 60.801699 #mm
+siteGeometry.focus_2x2_chuck_1: 60.733619 #mm
+siteGeometry.focus_2x2_chuck_2: 60.570025 #mm
+siteGeometry.focus_2x2_chuck_3: 60.566051 #mm
+siteGeometry.focus_2x2_chuck_4: 60.653204 #mm
+
+########################################
+#### 1x2 CROC assembly station: [pin coordinates]
+########################################
+siteGeometry.top_pin_1x2_hdi_launch: {322.260771,518.234492,58.226360}
+siteGeometry.bottom_pin_1x2_hdi_launch: {322.348759,583.401863,57.685997}
+siteGeometry.theta_1x2_hdi_launch: -0.077360
+
+siteGeometry.top_pin_1x2_chuck_0: {222.269692,517.798547,55.229421}
+siteGeometry.bottom_pin_1x2_chuck_0: {222.240118,582.921716,55.303190}
+siteGeometry.theta_1x2_chuck_0: 0.075076
+
+siteGeometry.top_pin_1x2_chuck_1: {222.130424,365.820514,55.991729}
+siteGeometry.bottom_pin_1x2_chuck_1: {222.524496,430.896237,56.044672}
+siteGeometry.theta_1x2_chuck_1: -0.297544
+
+siteGeometry.top_pin_1x2_chuck_2: {272.105311,365.619380,55.993435}
+siteGeometry.bottom_pin_1x2_chuck_2: {272.202001,430.664769,56.110741}
+siteGeometry.theta_1x2_chuck_2: -0.036125
+
+siteGeometry.top_pin_1x2_chuck_3: {322.455230,365.782362,56.005321}
+siteGeometry.bottom_pin_1x2_chuck_3: {322.521517,430.792712,55.999426}
+siteGeometry.theta_1x2_chuck_3: -0.013617
+
+siteGeometry.top_pin_1x2_chuck_4: {372.364021,365.532123,55.984029}
+siteGeometry.bottom_pin_1x2_chuck_4: {372.611793,430.575583,55.952605}
+siteGeometry.theta_1x2_chuck_4: -0.147911
+
+########################################
+#### 2x2 CROC assembly station: [pin coordinates]
+########################################
+siteGeometry.top_pin_2x2_hdi_launch: {639.741971,512.472239,58.175002}
+siteGeometry.bottom_pin_2x2_hdi_launch: {639.6579879,587.366970,58.175002}
+siteGeometry.theta_2x2_hdi_launch: 0.115719
+
+siteGeometry.top_pin_2x2_chuck_0: {489.812645,512.469072,55.103647}
+siteGeometry.bottom_pin_2x2_chuck_0: {0.134718,-0.067802,-0.031467}
+siteGeometry.theta_2x2_chuck_0: -0.113217
+
+siteGeometry.top_pin_2x2_chuck_1: {489.930547,360.206079,55.721987}
+siteGeometry.bottom_pin_2x2_chuck_1: {489.998734,435.229014,55.802055}
+siteGeometry.theta_2x2_chuck_1: -0.116324
+
+siteGeometry.top_pin_2x2_chuck_2: {564.560947,360.345494,55.676509}
+siteGeometry.bottom_pin_2x2_chuck_2: {564.684653,435.487088,55.775296}
+siteGeometry.theta_2x2_chuck_2: -0.158574
+
+siteGeometry.top_pin_2x2_chuck_3: {639.650361,360.052404,56.015021}
+siteGeometry.bottom_pin_2x2_chuck_3: {639.596799,435.185958,56.175004}
+siteGeometry.theta_2x2_chuck_3: -0.023403
+
+siteGeometry.top_pin_2x2_chuck_4: {714.255360,360.229986,55.615015}
+siteGeometry.bottom_pin_2x2_chuck_4: {714.582861,435.315605,55.684992}
+siteGeometry.theta_2x2_chuck_4: -0.314154
+
+
+###########################################
+######## GHCO & Drop Correction ###########
+###########################################
+
+siteGeometry.initial_ghco: {0.861566,102.293563,-4.553728}
+
+siteGeometry.initial_ghco_fid_loc: {-50.044363,20.352177,-0.500000} # Relative to HDI launch pad
+siteGeometry.initial_ghco_rot: -0.126316
+
+siteGeometry.drop_correction: {-0.007136,-0.003220,0.000000}
+siteGeometry.drop_rotation: -0.063641
+
+
+
+###########################################
+###### Offset Parameters: [Assembly] ######
+###########################################
+
+
+########################################
+#### 1x2 Mockup Assembly
+########################################
+siteGeometry.hdi_1x2_mockup_offset: {-8.079057,32.271548,0.000000}
+siteGeometry.hdi_1x2_mockup_angle: -0.173984
+
+siteGeometry.chip_1x2_mockup_offset: {-58.579509,31.316142,0.000000}
+siteGeometry.chip_1x2_mockup_angle: -0.016472
+
+siteGeometry.hdi_1x2_mockup_thickness: 0.251215
+siteGeometry.chip_1x2_mockup_thickness: 0.524990
+
+siteGeometry.drop_correction_1x2_mockup: {0.003685,-0.000795,0.000000}
+siteGeometry.drop_rotation_1x2_mockup: 0.046220
+
+siteGeometry.offset_dx_1x2_mockup: {0.000000,-0.013672,0.000000}
+
+
+########################################
+#### 1x2 CROC Assembly
+########################################
+
+
+########################################
+#### 2x2 CROC Assembly
+########################################
+
+
+
