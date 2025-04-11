@@ -1,0 +1,255 @@
+# This script is to configure the gantry's tool_holder_offset (ghco) vector in the flex_config
+#
+# Version 2 provides better documentation and explanation, to match a new SOP
+
+LOADCONFIG
+HOME
+SETLOG "LOG_Calibrate_GHCO.txt"
+
+COPY $fiducial_dx 21.350
+COPY $fiducial_dy 17.200
+
+COPY $tm_fid_1 {112.551,522.996,72.955}
+COPY $tm_fid_2 {112.032,544.339,72.955}
+COPY $tm_fid_3 {129.232,544.763,72.955}
+COPY $tm_fid_4 {129.750,523.421,72.955}
+COPY $chuck0_offset {-50.000,6.000,-6.40}
+
+COPY $tm_safe_z {0.000,0.000,-50.000}
+COPY $tm_close_z {0.000,0.000,-5.000}
+
+COPY $initial_ghco {0.849228,101.906706,-3.950}
+
+ADD $tm_center $tm_fid_1 $tm_fid_2
+ADD $tm_center $tm_center $tm_fid_3
+ADD $tm_center $tm_center $tm_fid_4
+MUL $tm_center $tm_center {0.25,0.25,0.25}
+ADD $tm_center $tm_center $tm_safe_z
+
+SETVAC gantry_head_outer 0
+SETVAC gantry_head_inner 0
+SETVAC croc_launchROC_top 0
+SETVAC croc_chuck_0_top 0
+
+@STEP_ONE CHOICEPOPUP $choice "Place 1x1 Thermal mockup on Chuck 1 top" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+SETVAC croc_launchROC_top 1
+
+MOVETO $tm_center 100
+
+@STEP_FID1 CHOICEPOPUP $choice "Survey fiducial 1" "Yes, continue" "No, abort"
+GOTOIFN @STEP_FID1 $choice
+MOVETO $tm_fid_1 10
+VIDEO
+GETPOS $survey_fid_1
+PRINT "Survey fid 1 = %v" $survey_fid_1
+
+@STEP_FID2 CHOICEPOPUP $choice "Survey fiducial 2" "Yes, continue" "No, go back"
+GOTOIFN @STEP_FID1 $choice
+MOVETO $tm_fid_2 10
+VIDEO
+GETPOS $survey_fid_2
+PRINT "Survey fid 2 = %v" $survey_fid_2
+
+@STEP_FID3 CHOICEPOPUP $choice "Survey fiducial 3" "Yes, continue" "No, go back"
+GOTOIFN @STEP_FID2 $choice
+MOVETO $tm_fid_3 10
+VIDEO
+GETPOS $survey_fid_3
+PRINT "Survey fid 3 = %v" $survey_fid_3
+
+@STEP_FID4 CHOICEPOPUP $choice "Survey fiducial 4" "Yes, continue" "No, go back"
+GOTOIFN @STEP_FID3 $choice
+MOVETO $tm_fid_4 10
+VIDEO
+GETPOS $survey_fid_4
+PRINT "Survey fid 4 = %v" $survey_fid_4
+
+@STEP_TOOL CHOICEPOPUP $choice "Ready to pick up part?" "Yes, continue" "No, go back"
+GOTOIFN @STEP_FID4 $choice
+
+MOVENAME tool_rack_pos_2_out 200
+LOADTOOL picker_tool
+
+ADD $tm_center $survey_fid_1 $survey_fid_2
+ADD $tm_center $tm_center $survey_fid_3
+ADD $tm_center $tm_center $survey_fid_4
+MUL $tm_center $tm_center {0.25,0.25,0.25}
+ADD $tm_xci $tm_center $chuck0_offset
+
+SUB $delta_fid_1 $survey_fid_1 $tm_center
+SUB $delta_fid_2 $survey_fid_2 $tm_center
+SUB $delta_fid_3 $survey_fid_3 $tm_center
+SUB $delta_fid_4 $survey_fid_4 $tm_center
+
+ADD $tm_pickup $tm_center $initial_ghco
+ADD $tm_pickup_safe $tm_pickup $tm_safe_z
+ADD $tm_pickup_close $tm_pickup $tm_close_z
+
+MOVETO $tm_pickup_safe 100
+
+@STEP_ROT CHOICEPOPUP $choice "Ready to move the part?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $tm_pickup_close 10
+MOVETO $tm_pickup 2
+SETVAC gantry_head_inner 1
+WAIT 2000
+SETVAC croc_launchROC_top 0
+WAIT 2000
+
+MOVETO $tm_pickup_close 2
+MOVETO $tm_pickup_safe 10
+
+ADD $tm_place_safe $tm_pickup_safe $chuck0_offset
+ADD $tm_place_close $tm_pickup_close $chuck0_offset
+ADD $tm_place $tm_pickup $chuck0_offset
+
+MOVETO $tm_place_safe 10
+MOVETO $tm_place_close 10
+ROTATETO 30 5
+MOVETO $tm_place 2
+SINE $sinth 30
+COSINE $costh 30
+
+SETVAC croc_chuck_0_top 1
+WAIT 2000
+SETVAC gantry_head_inner 0
+MOVETO $tm_place_close 2
+ROTATETO 0 10
+MOVETO $tm_place_safe 10
+
+MOVENAME tool_rack_pos_2_out 100
+UNLOADTOOL picker_tool
+
+SUB $tm_center $tm_place_safe $initial_ghco
+MOVETO $tm_center 100
+
+MUL $dxx $delta_fid_1.x $costh
+MUL $dxy $delta_fid_1.y $sinth
+SUB $dx $dxx $dxy
+MUL $dyx $delta_fid_1.y $costh
+MUL $dyy $delta_fid_1.x $sinth
+ADD $dy $dyx $dyy
+COPY $new_fid_1 {$dx,$dy,0.000}
+ADD $find_fid_1 $tm_center $new_fid_1
+SUB $find_fid_1 $find_fid_1 $tm_safe_z
+
+@STEP_FID5 CHOICEPOPUP $choice "Ready to survey fiducial 1?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $find_fid_1 10
+VIDEO
+GETPOS $new_fid_1
+PRINT "New fid 1 = %v" $new_fid_1
+SUB $offset_fid_1 $new_fid_1 $find_fid_1
+
+MUL $dxx $delta_fid_2.x $costh
+MUL $dxy $delta_fid_2.y $sinth
+SUB $dx $dxx $dxy
+MUL $dyx $delta_fid_2.y $costh
+MUL $dyy $delta_fid_2.x $sinth
+ADD $dy $dyx $dyy
+COPY $new_fid_2 {$dx,$dy,0.000}
+ADD $find_fid_2 $tm_center $new_fid_2
+ADD $find_fid_2 $find_fid_2 $offset_fid_1
+SUB $find_fid_2 $find_fid_2 $tm_safe_z
+
+@STEP_FID6 CHOICEPOPUP $choice "Ready to survey fiducial 2?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $find_fid_2 10
+VIDEO
+GETPOS $new_fid_2
+PRINT "New fid 2 = %v" $new_fid_2
+SUB $offset_fid_2 $new_fid_2 $find_fid_2
+ADD $offset_fid_2 $offset_fid_2 $offset_fid_1
+
+MUL $dxx $delta_fid_3.x $costh
+MUL $dxy $delta_fid_3.y $sinth
+SUB $dx $dxx $dxy
+MUL $dyx $delta_fid_3.y $costh
+MUL $dyy $delta_fid_3.x $sinth
+ADD $dy $dyx $dyy
+COPY $new_fid_3 {$dx,$dy,0.000}
+ADD $find_fid_3 $tm_center $new_fid_3
+ADD $find_fid_3 $find_fid_3 $offset_fid_2
+SUB $find_fid_3 $find_fid_3 $tm_safe_z
+
+@STEP_FID7 CHOICEPOPUP $choice "Ready to survey fiducial 3?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $find_fid_3 10
+VIDEO
+GETPOS $new_fid_3
+PRINT "New fid 3 = %v" $new_fid_3
+SUB $offset_fid_3 $new_fid_3 $find_fid_3
+ADD $offset_fid_3 $offset_fid_3 $offset_fid_2
+
+MUL $dxx $delta_fid_4.x $costh
+MUL $dxy $delta_fid_4.y $sinth
+SUB $dx $dxx $dxy
+MUL $dyx $delta_fid_4.y $costh
+MUL $dyy $delta_fid_4.x $sinth
+ADD $dy $dyx $dyy
+COPY $new_fid_4 {$dx,$dy,0.000}
+ADD $find_fid_4 $tm_center $new_fid_4
+ADD $find_fid_4 $find_fid_4 $offset_fid_3
+SUB $find_fid_4 $find_fid_4 $tm_safe_z
+
+@STEP_FID8 CHOICEPOPUP $choice "Ready to survey fiducial 4?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $find_fid_4 10
+VIDEO
+GETPOS $new_fid_4
+PRINT "New fid 4 = %v" $new_fid_4
+
+ADD $tm_center $new_fid_1 $new_fid_2
+ADD $tm_center $tm_center $new_fid_3
+ADD $tm_center $tm_center $new_fid_4
+MUL $tm_center $tm_center {0.25,0.25,0.25}
+COPY $tm_xcj $tm_center
+
+SUB $den $costh 1
+COPY $rinv_11 $den
+COPY $rinv_22 $den
+COPY $rinv_12 $sinth
+COPY $rinv_21 $sinth
+MUL $rinv_21 $rinv_21 -1
+MUL $den $den -2
+INVERT $rden $den
+MUL $rinv_11 $rinv_11 $rden
+MUL $rinv_12 $rinv_12 $rden
+MUL $rinv_21 $rinv_21 $rden
+MUL $rinv_22 $rinv_22 $rden
+SUB $delta $tm_xcj $tm_xci
+MUL $blah_a $rinv_11 $delta.x
+MUL $blah_b $rinv_12 $delta.y
+ADD $ghco_dx $blah_a $blah_b
+MUL $blah_a $rinv_21 $delta.x
+MUL $blah_b $rinv_22 $delta.y
+ADD $ghco_dy $blah_a $blah_b
+
+PRINT "GHCO correction dx = %f, dy = %f" $ghco_dx $ghco_dy
+COPY $ghco {$ghco_dx,$ghco_dy,0.000}
+ADD $ghco $ghco $initial_ghco
+
+PRINT "New GHCO offset = %v" $ghco
+
+SETVAC croc_chuck_0_top 0
+
+HOME
+
+END
+
+@STEP_ABORT GETPOS $current_pos
+COPY $safe_z_pos {$current_pos.x,$current_pos.y,10.0}
+MOVETO $safe_z_pos 2
+MOVENAME tool_rack_pos_2_out 100
+UNLOADTOOL picker_tool
+SETVAC croc_chuck_0_top 0
+SETVAC croc_launchROC_top 0
+HOME
+END

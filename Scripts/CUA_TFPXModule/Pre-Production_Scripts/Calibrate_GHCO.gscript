@@ -1,0 +1,431 @@
+# This script is to configure the gantry's tool_holder_offset (ghco) vector in the flex_config
+#
+# Version 1.00 provides better documentation and explanation, to match a new SOP
+# This also introduces the drop correction and drop rotation adjustments
+
+LOADCONFIG
+HOME
+
+PRINT "Calibrate_GHCO Version 1.00 running..."
+SETLOG "LOG_Calibrate_GHCO.txt"
+
+SETVAC gantry_head_outer 0
+SETVAC gantry_head_inner 0
+SETVAC croc_launchROC_top 0
+SETVAC croc_chuck_0_top 0
+
+#
+#  These are determined from the Initial_Gantry_Survey script
+#  Ideally, they should be read from the flex-config file
+#
+COPY $bolt_hole_origin {-83.365090,625.414110,92.520000}
+COPY $top_pin_1x2_hdi_launch {170.018828,516.864208,64.280000}
+COPY $top_pin_2x2_hdi_launch {639.829443,512.336249,63.274999}
+
+COPY $focus_1x2_hdi_launch 73.470000
+COPY $focus_1x2_chip_launch 73.470000
+COPY $focus_1x2_chuck_0 67.120000
+COPY $focus_1x2_chuck_1 67.074999
+COPY $focus_1x2_chuck_2 67.090000
+COPY $focus_1x2_chuck_3 67.085000
+COPY $focus_1x2_chuck_4 67.100000
+COPY $focus_2x2_hdi_launch 73.585000
+COPY $focus_2x2_chip_launch 73.510000
+COPY $focus_2x2_chuck_0 67.110000
+COPY $focus_2x2_chuck_1 67.200001
+COPY $focus_2x2_chuck_2 67.244999
+COPY $focus_2x2_chuck_3 67.340000
+COPY $focus_2x2_chuck_4 67.440000
+
+# This is with the terrible black suction cups
+# COPY $initial_ghco {0.816264,101.843457,-6.931915}
+
+# This is with the excellent white suction cups
+COPY $initial_ghco {0.836778,101.910113,-3.984000}
+
+COPY $drop_correction {-0.010613,0.010916,0.000000}
+COPY $drop_rotation -0.019972
+
+COPY $offset_chuck_0 {-50.000,5.000,0.000}              # offset from pickup point
+COPY $fiducial_dy 21.350
+COPY $fiducial_dx 17.200
+COPY $safe_z 20.000
+COPY $close_z 2.000
+COPY $overtravel_z 0.2       # this is how much to compress the suction cups
+
+# Calculate coordinates of the four fiducials on the 1x2 chip launch pad
+COPY $fiducial_1 {-8.600,-10.675,0.000}
+COPY $fiducial_2 {-8.600,10.675,0.000}
+COPY $fiducial_3 {8.600,-10.675,0.000}
+COPY $fiducial_4 {8.600,10.675,0.000}
+
+COPY $initial_rot 1.5
+COPY $initial_loc {-49.062876,17.061214,-0.500}      # Relative to HDI launch pad
+COPY $abs_loc {$top_pin_1x2_hdi_launch.x,$top_pin_1x2_hdi_launch.y,$focus_1x2_hdi_launch}
+ADD $abs_loc $abs_loc $initial_loc
+
+PRINT "Initial location = %v mm" $initial_loc
+PRINT "Initial rotation = %f deg" $initial_rot
+
+CALL @ROTATE $fiducial_1 $initial_rot -> $fiducial_1
+CALL @ROTATE $fiducial_2 $initial_rot -> $fiducial_2
+CALL @ROTATE $fiducial_3 $initial_rot -> $fiducial_3
+CALL @ROTATE $fiducial_4 $initial_rot -> $fiducial_4
+ATAN2 $expected_angle_1 $fiducial_1.x $fiducial_1.y
+ATAN2 $expected_angle_2 $fiducial_2.x $fiducial_2.y
+ATAN2 $expected_angle_3 $fiducial_3.x $fiducial_3.y
+ATAN2 $expected_angle_4 $fiducial_4.x $fiducial_4.y
+ADD $fiducial_1 $fiducial_1 $abs_loc
+ADD $fiducial_2 $fiducial_2 $abs_loc
+ADD $fiducial_3 $fiducial_3 $abs_loc
+ADD $fiducial_4 $fiducial_4 $abs_loc
+
+ADD $center $fiducial_1 $fiducial_2
+ADD $center $center $fiducial_3
+ADD $center $center $fiducial_4
+MUL $center $center {0.25,0.25,0.25}
+COPY $center {$center.x,$center.y,$safe_z} 
+
+@STEP_ONE CHOICEPOPUP $choice "Place 1x1 Thermal mockup on Chuck 1 top" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+SETVAC croc_launchROC_top 1
+
+MOVETO $center 100
+
+@STEP_FID1 CHOICEPOPUP $choice "Survey fiducial 1" "Yes, continue" "No, abort"
+GOTOIFN @STEP_FID1 $choice
+MOVETO $fiducial_1 10
+VIDEO
+GETPOS $survey_fid_1
+PRINT "Survey fid 1 = %v mm" $survey_fid_1
+
+@STEP_FID2 CHOICEPOPUP $choice "Survey fiducial 2" "Yes, continue" "No, go back"
+GOTOIFN @STEP_FID1 $choice
+MOVETO $fiducial_2 10
+VIDEO
+GETPOS $survey_fid_2
+PRINT "Survey fid 2 = %v mm" $survey_fid_2
+
+@STEP_FID3 CHOICEPOPUP $choice "Survey fiducial 3" "Yes, continue" "No, go back"
+GOTOIFN @STEP_FID2 $choice
+MOVETO $fiducial_3 10
+VIDEO
+GETPOS $survey_fid_3
+PRINT "Survey fid 3 = %v mm" $survey_fid_3
+
+@STEP_FID4 CHOICEPOPUP $choice "Survey fiducial 4" "Yes, continue" "No, go back"
+GOTOIFN @STEP_FID3 $choice
+MOVETO $fiducial_4 10
+VIDEO
+GETPOS $survey_fid_4
+PRINT "Survey fid 4 = %v mm" $survey_fid_4
+
+ADD $tm_center $survey_fid_1 $survey_fid_2
+ADD $tm_center $tm_center $survey_fid_3
+ADD $tm_center $tm_center $survey_fid_4
+MUL $tm_center $tm_center {0.25,0.25,0.25}
+SUB $tm_thickness $focus_1x2_chip_launch $tm_center.z
+
+SUB $delta_fid_1 $survey_fid_1 $tm_center
+SUB $delta_fid_2 $survey_fid_2 $tm_center
+SUB $delta_fid_3 $survey_fid_3 $tm_center
+SUB $delta_fid_4 $survey_fid_4 $tm_center
+
+ATAN2 $survey_angle_1 $delta_fid_1.x $delta_fid_1.y
+ATAN2 $survey_angle_2 $delta_fid_2.x $delta_fid_2.y
+ATAN2 $survey_angle_3 $delta_fid_3.x $delta_fid_3.y
+ATAN2 $survey_angle_4 $delta_fid_4.x $delta_fid_4.y
+SUB $delta_angle_1 $survey_angle_1 $expected_angle_1
+SUB $delta_angle_2 $survey_angle_2 $expected_angle_2
+SUB $delta_angle_3 $survey_angle_3 $expected_angle_3
+SUB $delta_angle_4 $survey_angle_4 $expected_angle_4
+ADD $average_angle $delta_angle_1 $delta_angle_2
+ADD $average_angle $average_angle $delta_angle_3
+ADD $average_angle $average_angle $delta_angle_4
+MUL $average_angle $average_angle 0.25
+ADD $final_ang $initial_rot $average_angle
+
+SUB $final_loc $tm_center $top_pin_1x2_hdi_launch
+COPY $final_loc {$final_loc.x,$final_loc.y,$initial_loc.z}
+PRINT "New initial 1x1 location = %v mm" $final_loc
+PRINT "New initial 1x1 rotation = %f deg" $final_ang
+
+@STEP_TOOL CHOICEPOPUP $choice "Ready to pick up part?" "Yes, continue" "No, go back"
+GOTOIFN @STEP_FID4 $choice
+
+MOVENAME tool_rack_pos_2_out 200
+LOADTOOL picker_tool
+
+
+
+ADD $tm_xci $tm_center $offset_chuck_0
+ADD $tm_pickup $tm_center $initial_ghco
+COPY $tm_pickup_safe {$tm_pickup.x,$tm_pickup.y,$safe_z}
+
+MOVETO $tm_pickup_safe 100
+
+COPY $touchdown $tm_pickup
+PRINT "Expected picker tool touchdown z = %f mm" $touchdown.z 
+
+ADD $tm_pickup_close $touchdown {0.000,0.000,-10.000}
+MOVETO $tm_pickup_close 10
+
+@STEP_Z CHOICEPOPUP $choice "Measure GHCO z displacement?" "Yes, continue" "No, skip"
+GOTOIFN @TOUCHDOWN $choice
+
+@STEP_ROT CHOICEPOPUP $choice "Adjust Z until touch down." "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+GETPOS $touchdown
+
+@TOUCHDOWN PRINT "Touchdown z = %f mm" $touchdown.z
+SUB $ghco_z $touchdown.z $tm_center.z
+PRINT "New GHCO z offset = %f mm" $ghco_z
+COPY $initial_ghco {$initial_ghco.x,$initial_ghco.y,$ghco_z}
+
+ADD $tm_pickup $touchdown {0.000,0.000,$overtravel_z}
+SUB $tm_pickup_close $tm_pickup {0.000,0.000,$close_z}
+COPY $tm_pickup_safe {$tm_pickup.x,$tm_pickup.y,$safe_z}
+
+PRINT "Touchdown point = %v mm" $touchdown
+PRINT "Close to pickup point = %v mm" $tm_pickup_close
+PRINT "Pickup point = %v mm" $tm_pickup
+
+@STEP_ROT CHOICEPOPUP $choice "Ready to pick up part?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $tm_pickup_close 5
+MOVETO $tm_pickup 0.5
+
+SETVAC gantry_head_inner 1
+WAIT 2000
+SETVAC croc_launchROC_top 0
+WAIT 2000
+
+MOVETO $tm_pickup_close 0.5
+MOVETO $tm_pickup_safe 10
+
+ADD $tm_place_safe $tm_pickup_safe $offset_chuck_0
+ADD $tm_place $tm_pickup $offset_chuck_0
+SUB $carrier_thickness $focus_1x2_chip_launch $focus_1x2_chuck_0
+SUB $place_z $tm_pickup.z $carrier_thickness
+COPY $tm_place {$tm_place.x,$tm_place.y,$place_z}
+SUB $tm_place_close $tm_place {0.000,0.000,$close_z}
+
+PRINT "Initial move %v" $tm_place_safe
+PRINT "Final move %v" $tm_place
+
+
+COPY $angle 30.000
+GETFLOATPOPUP $angle "Rotation angle?  Should be 30 deg."
+PRINT "Part will be rotated by %f deg." $angle
+
+CALL @ROTATE $drop_correction $angle -> $drop_correction
+SUB $tm_place_corrected $tm_place $drop_correction
+PRINT "After drop correction %v" $tm_place_corrected
+
+@STEP_PLACE CHOICEPOPUP $choice "Ready to place part?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $tm_place_safe 10
+MOVETO $tm_place_close 5
+SUB $corrected_angle $angle $drop_rotation
+ROTATETO $corrected_angle 5
+MOVETO $tm_place_corrected 0.5
+
+SINE $sinth $angle
+COSINE $costh $angle
+
+SETVAC croc_chuck_0_top 1
+WAIT 2000
+SETVAC gantry_head_inner 0
+MOVETO $tm_place_close 1
+ROTATETO 0 10
+MOVETO $tm_place_safe 10
+
+MOVENAME tool_rack_pos_2_out 100
+UNLOADTOOL picker_tool
+
+SUB $tm_center $tm_place $initial_ghco
+SUB $tm_center $tm_center {0.000,0.000,$overtravel_z}
+COPY $tm_center_safe {$tm_center.x,$tm_center.y,$safe_z}
+
+MOVETO $tm_center_safe 100
+
+MUL $dxx $delta_fid_1.x $costh
+MUL $dxy $delta_fid_1.y $sinth
+SUB $dx $dxx $dxy
+MUL $dyx $delta_fid_1.y $costh
+MUL $dyy $delta_fid_1.x $sinth
+ADD $dy $dyx $dyy
+COPY $new_fid_1 {$dx,$dy,0.000}
+ADD $find_fid_1 $tm_center $new_fid_1
+ATAN2 $angle_fid_1 $dx $dy
+PRINT "Expected angle fid 1 = %f deg" $angle_fid_1
+
+@STEP_FID5 CHOICEPOPUP $choice "Ready to survey fiducial 1?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $find_fid_1 10
+VIDEO
+GETPOS $new_fid_1
+PRINT "New fid 1 = %v" $new_fid_1
+SUB $offset_fid_1 $new_fid_1 $find_fid_1
+SUB $dx $new_fid_1.x $tm_center.x
+SUB $dy $new_fid_1.y $tm_center.y
+ATAN2 $new_angle_fid_1 $dx $dy
+PRINT "Actual angle = %f deg" $new_angle_fid_1
+SUB $rot_1 $new_angle_fid_1 $angle_fid_1
+
+MUL $dxx $delta_fid_2.x $costh
+MUL $dxy $delta_fid_2.y $sinth
+SUB $dx $dxx $dxy
+MUL $dyx $delta_fid_2.y $costh
+MUL $dyy $delta_fid_2.x $sinth
+ADD $dy $dyx $dyy
+COPY $new_fid_2 {$dx,$dy,0.000}
+ADD $find_fid_2 $tm_center $new_fid_2
+ATAN2 $angle_fid_2 $dx $dy
+PRINT "Expected angle fid 2 = %f deg" $angle_fid_2
+
+@STEP_FID6 CHOICEPOPUP $choice "Ready to survey fiducial 2?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $find_fid_2 10
+VIDEO
+GETPOS $new_fid_2
+PRINT "New fid 2 = %v" $new_fid_2
+SUB $offset_fid_2 $new_fid_2 $find_fid_2
+SUB $dx $new_fid_2.x $tm_center.x
+SUB $dy $new_fid_2.y $tm_center.y
+ATAN2 $new_angle_fid_2 $dx $dy
+PRINT "Actual angle = %f deg" $new_angle_fid_2
+SUB $rot_2 $new_angle_fid_2 $angle_fid_2
+
+MUL $dxx $delta_fid_3.x $costh
+MUL $dxy $delta_fid_3.y $sinth
+SUB $dx $dxx $dxy
+MUL $dyx $delta_fid_3.y $costh
+MUL $dyy $delta_fid_3.x $sinth
+ADD $dy $dyx $dyy
+COPY $new_fid_3 {$dx,$dy,0.000}
+ADD $find_fid_3 $tm_center $new_fid_3
+ATAN2 $angle_fid_3 $dx $dy
+PRINT "Expected angle fid 3 = %f deg" $angle_fid_3
+
+@STEP_FID7 CHOICEPOPUP $choice "Ready to survey fiducial 3?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $find_fid_3 10
+VIDEO
+GETPOS $new_fid_3
+PRINT "New fid 3 = %v" $new_fid_3
+SUB $offset_fid_3 $new_fid_3 $find_fid_3
+SUB $dx $new_fid_3.x $tm_center.x
+SUB $dy $new_fid_3.y $tm_center.y
+ATAN2 $new_angle_fid_3 $dx $dy
+PRINT "Actual angle = %f deg" $new_angle_fid_3
+SUB $rot_3 $new_angle_fid_3 $angle_fid_3
+
+MUL $dxx $delta_fid_4.x $costh
+MUL $dxy $delta_fid_4.y $sinth
+SUB $dx $dxx $dxy
+MUL $dyx $delta_fid_4.y $costh
+MUL $dyy $delta_fid_4.x $sinth
+ADD $dy $dyx $dyy
+COPY $new_fid_4 {$dx,$dy,0.000}
+ADD $find_fid_4 $tm_center $new_fid_4
+ATAN2 $angle_fid_4 $dx $dy
+PRINT "Expected angle fid 4 = %f deg" $angle_fid_4
+
+@STEP_FID8 CHOICEPOPUP $choice "Ready to survey fiducial 4?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVETO $find_fid_4 10
+VIDEO
+GETPOS $new_fid_4
+PRINT "New fid 4 = %v" $new_fid_4
+SUB $offset_fid_4 $new_fid_4 $find_fid_4
+SUB $dx $new_fid_4.x $tm_center.x
+SUB $dy $new_fid_4.y $tm_center.y
+ATAN2 $new_angle_fid_4 $dx $dy
+PRINT "Actual angle = %f deg" $new_angle_fid_4
+SUB $rot_4 $new_angle_fid_4 $angle_fid_4
+
+ADD $avgrot $rot_1 $rot_2
+ADD $avgrot $avgrot $rot_3
+ADD $avgrot $avgrot $rot_4
+MUL $avgrot $avgrot 0.25
+PRINT "Average rotation = %f deg" $avgrot
+ADD $new_drop_rotation $drop_rotation $avgrot
+PRINT "New drop rotation angle = %f deg" $new_drop_rotation
+
+ADD $tm_center $new_fid_1 $new_fid_2
+ADD $tm_center $tm_center $new_fid_3
+ADD $tm_center $tm_center $new_fid_4
+MUL $tm_center $tm_center {0.25,0.25,0.25}
+COPY $tm_xcj $tm_center
+
+SUB $den $costh 1
+COPY $rinv_11 $den
+COPY $rinv_22 $den
+COPY $rinv_12 $sinth
+COPY $rinv_21 $sinth
+MUL $rinv_21 $rinv_21 -1
+MUL $den $den -2
+INVERT $rden $den
+MUL $rinv_11 $rinv_11 $rden
+MUL $rinv_12 $rinv_12 $rden
+MUL $rinv_21 $rinv_21 $rden
+MUL $rinv_22 $rinv_22 $rden
+SUB $delta $tm_xcj $tm_xci
+MUL $blah_a $rinv_11 $delta.x
+MUL $blah_b $rinv_12 $delta.y
+ADD $ghco_dx $blah_a $blah_b
+MUL $blah_a $rinv_21 $delta.x
+MUL $blah_b $rinv_22 $delta.y
+ADD $ghco_dy $blah_a $blah_b
+
+ADD $new_drop_correction $drop_correction $delta
+COPY $new_drop_correction {$new_drop_correction.x,$new_drop_correction.y,0.000000}
+COPY $delta {$delta.x,$delta.y,0.000000}
+PRINT "Displacement from expected = %v mm" $delta
+PRINT "New drop correction = %v mm" $new_drop_correction
+
+PRINT "GHCO correction dx = %f, dy = %f" $ghco_dx $ghco_dy
+COPY $ghco {$ghco_dx,$ghco_dy,0.000}
+ADD $ghco $ghco $initial_ghco
+COPY $ghco {$ghco.x,$ghco.y,$ghco_z}
+
+PRINT "New GHCO offset = %v" $ghco
+
+SETVAC croc_chuck_0_top 0
+
+HOME
+
+END
+
+@STEP_ABORT GETPOS $current_pos
+COPY $safe_z_pos {$current_pos.x,$current_pos.y,10.0}
+MOVETO $safe_z_pos 5
+MOVENAME tool_rack_pos_2_out 100
+UNLOADTOOL picker_tool
+SETVAC croc_chuck_0_top 0
+SETVAC croc_launchROC_top 0
+HOME
+END
+
+@ROTATE(vec,angle)
+  SIN $sinth $angle
+  COS $costh $angle
+  MUL $dxx $vec.x $costh
+  MUL $dxy $vec.y $sinth
+  MUL $dyx $vec.x $sinth
+  MUL $dyy $vec.y $costh
+  COPY $vec {$dxx,$dyy,$vec.z}
+  SUB $vec $vec {$dxy,0.0,0.0}
+  ADD $vec $vec {0.0,$dyx,0.0}
+  RETURN $vec
+
+

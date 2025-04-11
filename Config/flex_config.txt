@@ -65,13 +65,20 @@ vacuum.croc_launchROC_top: 5
 vacuum.croc_launchROC_bot: 9
 vacuum.croc_chuck_0_top: 13
 vacuum.croc_chuck_0_bot: 14
-vacuum.croc_chuck_1_top: 13
-vacuum.croc_chuck_1_bot: 14
-vacuum.croc_chuck_2_top: 5
-vacuum.croc_chuck_2_bot: 9
-vacuum.croc_chuck_3: 15
+vacuum.croc_chuck_1_top: 31
+vacuum.croc_chuck_1_bot: 31
+vacuum.croc_chuck_2_top: 29
+vacuum.croc_chuck_2_bot: 29
+vacuum.croc_chuck_3_top: 25
+vacuum.croc_chuck_3_bot: 25
+vacuum.croc_chuck_4_top: 24
+vacuum.croc_chuck_4_bot: 24
 vacuum.croc_hdipicker: 7
 vacuum.croc_weight_0: 7
+vacuum.croc_weight_1: 7
+vacuum.croc_weight_2: 7
+vacuum.croc_weight_3: 7
+vacuum.croc_weight_4: 7
 
 
 
@@ -216,7 +223,7 @@ geometry.TFPX_CROC_MULTIGLASS.thickness: 0.513
 geometry.TFPX_CROC_SINGLEGLASS.thickness: 0.500
 
 geometry.TFPX_CROC_HDI.thickness: 0.290
-geometry.TFPX_CROC_HDI.dist_top2bot: {0.035826,43.080907,0.02}
+geometry.TFPX_CROC_HDI.dist_top2bot: {0.129243,43.153067,0.0} # {0.035826,43.080907,0.02}
 geometry.TFPX_CROC1X2_HDI.fid_tr: {8.600,-21.600,0}
 geometry.TFPX_CROC1X2_HDI.fid_tl: {-8.600,-21.600,0}
 geometry.TFPX_CROC1X2_HDI.fid_bl: {-8.600,21.600,0}
@@ -276,12 +283,7 @@ geometry.PICKER_TOOL.center_offset: {0,0,54.65} # {0,0,47.72}
 # The offset between the camera and the
 # center-of-rotation of the gantry head in x-y
 # and the bottom surface of the tool-holder in z
-# geometry.tool_holder_offset: {-0.3164824463,-102.2873920141,-17.0} # REFERENCE POINT
-# geometry.tool_holder_offset: {-0.3079674542,-102.2929647457,-17.2} # REFERENCE POINT # x=-679.41 µm | y=-83.76 µm
-# geometry.tool_holder_offset: {0.3714394647,-102.2092046759,-17.20} # x=7.74 µm | y=-5.02 µm
-# geometry.tool_holder_offset: {0.3636974767,-102.2041819747,-17.20} #  x=3.16 µm | y=3.67 µm
-# geometry.tool_holder_offset: {0.3605405310,-102.2078507414,-17.20}   # x=3.18 µm | y=2.92 µm
-geometry.tool_holder_offset: {0.3605405310,-102.2078507414,-23.53} # May 30, 2024 
+geometry.tool_holder_offset: {-0.872229741,-102.3063537932,-50.4} # MAR 12, 2025 
 
 
 #================================================
@@ -317,33 +319,33 @@ siteGeometry.pos_BLsenRoc_launch_tr: {723.571069,232.210150,62.521771}
 siteGeometry.pos_TLsenRoc_launch_tr: {723.507602,212.044947,62.369772}
 
 ###Information for the CROC HDI
-siteGeometry.pos_croc_hdi_top1: {315.241301,529.457358,93.859997}
-siteGeometry.pos_croc_hdi_top2: {314.842789,550.753913,93.919998}
+siteGeometry.pos_croc_hdi_top1: {313.981613,528.938830,66.949805}
+siteGeometry.pos_croc_hdi_top2: {314.242036,529.011996,66.949847}
 siteGeometry.dist_hdi_bondpads: 43.080 #mm
 siteGeometry.dist_hdi_half_bondpads: 16.803 #mm
 
-siteGeometry.pos_final_croc1x2_hdi_tr_STAT_0: {214.529493,529.200332,87.503503}
-siteGeometry.pos_final_croc1x2_hdi_tr_STAT_1: {214.962780,376.995675,87.578511}
-siteGeometry.pos_final_croc1x2_hdi_tr_STAT_2: {264.765380,376.858891,87.573513}
-siteGeometry.pos_final_croc1x2_hdi_tr_STAT_3: {315.408806,377.040207,87.578508}
-siteGeometry.pos_final_croc1x2_hdi_tr_STAT_4: {365.111691,376.566258,87.503506}
+siteGeometry.pos_final_croc1x2_hdi_tr_STAT_0: {213.600679,528.666995,60.598487}
+siteGeometry.pos_final_croc1x2_hdi_tr_STAT_1: {213.999164,376.502647,60.590487}
+siteGeometry.pos_final_croc1x2_hdi_tr_STAT_2: {263.805979,376.322376,60.590430}
+siteGeometry.pos_final_croc1x2_hdi_tr_STAT_3: {314.136356,376.498401,60.588502}
+siteGeometry.pos_final_croc1x2_hdi_tr_STAT_4: {364.122786,376.286354,60.588488}
 
 # CROC 1x2 HDI pick and place translation vector and rotation angle
 # CROC 1x2 Station #0
-siteGeometry.croc_v_translation_STAT_0: {-100.320443,-0.055543,-6.485292}
-siteGeometry.croc_rot_translation_STAT_0: -0.164323
+siteGeometry.croc_v_translation_STAT_0: {-100.053765,-0.450110,-6.339376}
+siteGeometry.croc_rot_translation_STAT_0: 0.058088
 # CROC 1x2 Station #1
 siteGeometry.croc_v_translation_STAT_1: {-99.988595,-152.377117,-6.281328}
-siteGeometry.croc_rot_translation_STAT_1: -0.274865
+siteGeometry.croc_rot_translation_STAT_1: -0.248326
 # CROC 1x2 Station #2
-siteGeometry.croc_v_translation_STAT_2: {-50.111459,-152.521335,-6.296488}
-siteGeometry.croc_rot_translation_STAT_2: -0.366643
+siteGeometry.croc_v_translation_STAT_2: {-50.153197,-152.615123,-6.343980}
+siteGeometry.croc_rot_translation_STAT_2: -0.062402
 # CROC 1x2 Station #3
-siteGeometry.croc_v_translation_STAT_3: {0.182024,-152.436784,-6.303991}
-siteGeometry.croc_rot_translation_STAT_3: -0.007681
+siteGeometry.croc_v_translation_STAT_3: {0.162399,-152.438819,-6.382560}
+siteGeometry.croc_rot_translation_STAT_3: -0.018856
 # CROC 1x2 Station #4
-siteGeometry.croc_v_translation_STAT_4: {50.173737,-152.670020,-6.361473}
-siteGeometry.croc_rot_translation_STAT_4: -0.140869
+siteGeometry.croc_v_translation_STAT_4: {50.200932,-152.652202,-6.362443}
+siteGeometry.croc_rot_translation_STAT_4: -0.175875
 #########################
 
 
@@ -352,18 +354,18 @@ siteGeometry.pos_croc_singleGlass_top1: {262.491543,528.456737,68.702000}
 siteGeometry.dist_singleGlass_bondpads: 41.503 #mm
 
 # Vector from center of the bond pads to the center of the Single Glass Piece (at rot = 0)
-siteGeometry.singleGlass_bondsToCenter: {9.3372,-0.0036,0} 
+siteGeometry.singleGlass_bondsToCenter: {9.3372,-0.0036,0}
 
 
 ### Information for the CROC Multi Glass Script
-# siteGeometry.pos_croc_TOPGlass_top1: {111.517,523.762,99.772}
-# siteGeometry.pos_croc_BOTGlass_top1: {111.064,552.390,99.737}
+# siteGeometry.pos_croc_TOPGlass_top1: {111.517,523.762,66.772}
+# siteGeometry.pos_croc_BOTGlass_top1: {111.064,552.390,66.737}
 # siteGeometry.dist_multiGlass_bondpads: 19.698 #mm
 
 
 ### Information for the CROC Dual ROC Script
-siteGeometry.pos_croc_TOPROC_top1: {262.954794,527.866309,93.365004}
-siteGeometry.pos_croc_BOTROC_top1: {263.006478,550.606571,93.375018}
+siteGeometry.pos_croc_TOPROC_top1: {262.954794,527.866309,66.365004} # 93.365004}
+siteGeometry.pos_croc_BOTROC_top1: {263.006478,550.606571,66.375018} # 93.375018}
 siteGeometry.delta_TOPROC: {0.0,0,0}
 siteGeometry.delta_BOTROC: {0.15,0,0}
 
@@ -375,7 +377,7 @@ siteGeometry.dualROC_bondsToCenter: {11.828,0,0}
 
 
 ### Information for the CROC Sensor ROC Script
-siteGeometry.pos_croc_SensorROC_top1: {262.893679,528.199234,94.045004}
+siteGeometry.pos_croc_SensorROC_top1: {262.893679,528.199234,67.145004} # 94.045004}
 siteGeometry.delta_SEN_CROC: {0.06,0,0}
 
 # Vector from center of the bond pads on the Sensor ROC to its center
@@ -399,20 +401,20 @@ siteGeometry.rot_ROC_error: 0.
 ### QuadROC Information
 
 # HDI position data
-siteGeometry.pos_croc2x2_hdi_TR: {657.620475,523.442667,93.765479}
-siteGeometry.pos_final_croc2x2_hdi_tr: {507.855616,523.426771,87.375407}
+siteGeometry.pos_croc2x2_hdi_TR: {656.334263,523.314375,66.759878}
+siteGeometry.pos_final_croc2x2_hdi_tr: {506.414446,523.309066,60.660586}
 
-siteGeometry.pos_final_croc2x2_hdi_tr_STAT_0: {507.855616,523.426771,87.375407}
-siteGeometry.pos_final_croc2x2_hdi_tr_STAT_1: {507.855616,371.122734,87.325409}
-siteGeometry.pos_final_croc2x2_hdi_tr_STAT_2: {582.683182,371.122734,87.325409}
-siteGeometry.pos_final_croc2x2_hdi_tr_STAT_3: {657.510747,371.122734,87.325409}
-siteGeometry.pos_final_croc2x2_hdi_tr_STAT_4: {732.338313,371.122734,87.325409}
+siteGeometry.pos_final_croc2x2_hdi_tr_STAT_0: {506.414446,523.309066,60.660586}
+siteGeometry.pos_final_croc2x2_hdi_tr_STAT_1: {507.855616,371.122734,60.660586}
+siteGeometry.pos_final_croc2x2_hdi_tr_STAT_2: {582.683182,371.122734,60.660586}
+siteGeometry.pos_final_croc2x2_hdi_tr_STAT_3: {657.510747,371.122734,60.660586}
+siteGeometry.pos_final_croc2x2_hdi_tr_STAT_4: {732.338313,371.122734,60.660586}
 
  # QuadROC position data
-siteGeometry.pos_croc2x2LaunchROC_TR: {584.730885,522.345364,93.781025}
-siteGeometry.pos_croc2x2LaunchROC_BR: {584.828988,543.828198,93.201044}
-siteGeometry.pos_croc2x2LaunchROC_BL: {566.075420,543.886810,93.201100}
-siteGeometry.pos_croc2x2LaunchROC_TL: {565.982649,522.120571,93.201077}
+siteGeometry.pos_croc2x2LaunchROC_TR: {583.443625,522.248885,66.840529}
+siteGeometry.pos_croc2x2LaunchROC_BR: {583.590166,565.189511,66.825472}
+siteGeometry.pos_croc2x2LaunchROC_BL: {546.341964,565.469441,66.870518}
+siteGeometry.pos_croc2x2LaunchROC_TL: {546.087875,522.458838,66.895487}
 
  # Vector from midpoint of bondpad edge to 
 siteGeometry.quadROC_bondsToCenter: {9.228,0,0}
@@ -420,8 +422,8 @@ siteGeometry.quadROC_bondsToCenter: {9.228,0,0}
 
 # CROC 2x2 HDI pick and place translation vector and rotation angle
 # CROC 2x2 Station #0
-siteGeometry.pos_croc2x2_translation_STAT_0: {-149.9292,-0.0164,-6.208} # FINAL Aug 01, 2023
-siteGeometry.rot_croc2x2_translation_STAT_0: -0.0500 # FINAL Aug 01, 2023
+siteGeometry.pos_croc2x2_translation_STAT_0: {-149.9099,-0.0032,-6.1866} # FINAL Apr 01, 2025
+siteGeometry.rot_croc2x2_translation_STAT_0: -0.0805 # FINAL Apr 01, 2025
 # CROC 2x2 Station #1
 siteGeometry.croc2x2_v_translation_STAT_1: {-149.797833,-152.297388,-6.352937}
 siteGeometry.croc2x2_rot_translation_STAT_1: 0.004225
@@ -552,6 +554,7 @@ graph_motion.pos.safeUnload: {190,90,0}
 graph_motion.pos.stagingArea: {584,245,0} # {330,175,0} # {590,337,0} 
 graph_motion.pos.standAside: {584,245,0}
 graph_motion.pos.crocStaging: {584,245,0}
+graph_motion.pos.crocStaging_1x2: {130,270,0}
 
 #graph_motion.pos.hdi_position: {721.430,342.000,61.432001}
 #graph_motion.pos.home_safe: {0,450.000,0}
@@ -584,6 +587,7 @@ graph_motion.edge.standAside.stagingArea: True
 graph_motion.edge.standAside.tool_rack_pos_2_out: True
 graph_motion.edge.home.crocStaging: True
 graph_motion.edge.safeUnload.crocStaging: True
+graph_motion.edge.safeUnload.crocStaging_1x2: True
 
 
 # graph_motion.edge.safeUnload.standAside: True

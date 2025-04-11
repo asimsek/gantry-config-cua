@@ -1,0 +1,317 @@
+# This script is to survey a 1x2 thermal mockup.
+#
+# Version 2 provides better documentation and explanation, to match a new SOP
+
+LOADCONFIG
+HOME
+SETLOG "LOG_Survey_2x2_Mockup.txt"
+
+PRINT "Survey_2x2_mockup Version 1.0 running"
+
+COPY $fiducial_dx 21.350
+COPY $fiducial_dy 17.200
+COPY $hdi_launch_pin_height 7.6132
+COPY $ghco {0.849228,101.906706,-3.950}
+
+COPY $top_pin_hdi_launch {639.918796,512.390551,63.102000}
+#
+# These are the 2x2 assembly chuck positions, determined using the Calibrate_2x2_Chuck_Offset script
+# angles are in degrees
+#
+COPY $top_pin_chuck_0 {490.256354,511.862306,56.753250}
+COPY $theta_chuck_0 -0.120713
+COPY $top_pin_chuck_1 {490.481727,359.895776,56.913251}
+COPY $theta_chuck_1 0.0090973
+COPY $top_pin_chuck_2 {565.161921,359.715107,56.885333}
+COPY $theta_chuck_2 -0.090199
+COPY $top_pin_chuck_3 {639.996373,360.122438,56.915335}
+COPY $theta_chuck_3 -0.152175
+COPY $top_pin_chuck_4 {714.891606,360.224260,56.902000}
+COPY $theta_chuck_4 0.0087394
+
+# bond pad centers on HDI launch pad
+COPY $bond_pad_1 {623.475,523.120,73.197}
+COPY $bond_pad_2 {623.499,544.361,73.197}
+COPY $bond_pad_3 {623.385,544.966,73.197}
+COPY $bond_pad_4 {623.400,566.213,73.197}
+
+COPY $bond_pad_5 {656.596,523.418,73.197}
+COPY $bond_pad_6 {656.630,544.660,73.197}
+COPY $bond_pad_7 {656.515,545.259,73.197}
+COPY $bond_pad_8 {656.531,566.503,73.197}
+
+COPY $hdi_focus_z 66.418
+COPY $heater_focus_z 66.598
+
+COPY $tm_safe_z {0.000,0.000,-50.000}
+COPY $tm_close_z {0.000,0.000,-5.000}
+
+# this controls the position of the chip relative to the HDI
+COPY $wire_bond_length 2.45
+COPY $nominal_pad_1 {2.35,-0.175,0.00}
+COPY $nominal_pad_4 {2.45,0.025,0.00}
+COPY $nominal_pad_5 {-2.45,-0.025,0.00}
+COPY $nominal_pad_8 {-2.35,0.175,0.00}
+COPY $fiducial_offset 1.41
+COPY $pickup_offset 8.00
+ADD $offset $pickup_offset $fiducial_offset
+SUB $offset $offset $wire_bond_length
+COPY $offset_dx {$offset,0.0,0.0}
+
+SETVAC gantry_head_outer 0
+SETVAC gantry_head_inner 0
+
+@STEP_PROMPT GETINTPOPUP $station "Which assembly chuck? (0-4)"
+GOTOIF @DISPLAY_ERROR `$station<0`
+GOTOIF @STATION_0 `$station<1`
+GOTOIF @STATION_1 `$station<2`
+GOTOIF @STATION_2 `$station<3`
+GOTOIF @STATION_3 `$station<4`
+GOTOIF @STATION_4 `$station<5`
+@DISPLAY_ERROR CHOICEPOPUP $trash "Bad number. Try again." "Sorry" "My bad"
+GOTO @STEP_PROMPT
+@STATION_0 COPY $theta_chuck $theta_chuck_0
+COPY $top_pin_chuck $top_pin_chuck_0
+GOTO @SURVEY_PART
+
+@STATION_1 COPY $theta_chuck $theta_chuck_1
+COPY $top_pin_chuck $top_pin_chuck_1
+GOTO @SURVEY_PART
+
+@STATION_2 COPY $theta_chuck $theta_chuck_2
+COPY $top_pin_chuck $top_pin_chuck_2
+GOTO @SURVEY_PART
+
+@STATION_3 COPY $theta_chuck $theta_chuck_3
+COPY $top_pin_chuck $top_pin_chuck_3
+GOTO @SURVEY_PART
+
+@STATION_4 COPY $theta_chuck $theta_chuck_4
+COPY $top_pin_chuck $top_pin_chuck_4
+
+PRINT "Surveying module on chuck %d" $station
+
+@SURVEY_PART SUB $bond_pad_1 $bond_pad_1 $top_pin_hdi_launch
+CALL @ROTATE $bond_pad_1 $theta_chuck -> $bond_pad_1
+ADD $bond_pad_1 $bond_pad_1 $top_pin_chuck
+COPY $bond_pad_1 {$bond_pad_1.x,$bond_pad_1.y,$hdi_focus_z}
+SUB $bond_pad_1_safe $bond_pad_1 {0.0,0.0,20.0}
+MOVETO $bond_pad_1_safe 100
+MOVETO $bond_pad_1 10
+
+@STEP_PAD CHOICEPOPUP $choice "Survey center of HDI bond pad 1" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $survey_pad_1
+
+SUB $heater_pad_1 $survey_pad_1 {$wire_bond_length,0.0,0.0}
+COPY $heater_pad_1 {$heater_pad_1.x,$heater_pad_1.y,$heater_focus_z}
+MOVETO $heater_pad_1 10
+
+@STEP_PAD CHOICEPOPUP $choice "Survey center of heater bond pad 1" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $survey_other_1
+
+
+
+SUB $bond_pad_4 $bond_pad_4 $top_pin_hdi_launch
+CALL @ROTATE $bond_pad_4 $theta_chuck -> $bond_pad_4
+ADD $bond_pad_4 $bond_pad_4 $top_pin_chuck
+COPY $bond_pad_4 {$bond_pad_4.x,$bond_pad_4.y,$hdi_focus_z}
+# PRINT "Should find bond pad 4 at %v mm" $bond_pad_4
+MOVETO $bond_pad_4 10
+
+@STEP_PAD CHOICEPOPUP $choice "Survey center of HDI bond pad 4" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $survey_pad_4
+
+SUB $heater_pad_4 $survey_pad_4 {$wire_bond_length,0.0,0.0}
+COPY $heater_pad_4 {$heater_pad_4.x,$heater_pad_4.y,$heater_focus_z}
+MOVETO $heater_pad_4 10
+
+@STEP_PAD CHOICEPOPUP $choice "Survey center of heater bond pad 4" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $survey_other_4
+
+
+
+#
+#  Top right corner
+#
+SUB $bond_pad_5 $bond_pad_5 $top_pin_hdi_launch
+CALL @ROTATE $bond_pad_5 $theta_chuck -> $bond_pad_5
+ADD $bond_pad_5 $bond_pad_5 $top_pin_chuck
+COPY $bond_pad_5 {$bond_pad_5.x,$bond_pad_5.y,$hdi_focus_z}
+SUB $bond_pad_5_safe $bond_pad_5 {0.0,0.0,20.0}
+# PRINT "Should find bond pad 5 at %v mm" $bond_pad_5
+MOVETO $bond_pad_5_safe 50
+MOVETO $bond_pad_5 10
+
+CHOICEPOPUP $choice "Survey center of HDI bond pad 5" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $survey_pad_5
+
+ADD $heater_pad_5 $survey_pad_5 {$wire_bond_length,0.0,0.0}
+COPY $heater_pad_5 {$heater_pad_5.x,$heater_pad_5.y,$heater_focus_z}
+MOVETO $heater_pad_5 10
+
+CHOICEPOPUP $choice "Survey center of heater bond pad 5" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $survey_other_5
+
+SUB $bond_pad_8 $bond_pad_8 $top_pin_hdi_launch
+CALL @ROTATE $bond_pad_8 $theta_chuck -> $bond_pad_8
+ADD $bond_pad_8 $bond_pad_8 $top_pin_chuck
+COPY $bond_pad_8 {$bond_pad_8.x,$bond_pad_8.y,$hdi_focus_z}
+# PRINT "Should find bond pad 8 at %v mm" $bond_pad_8
+MOVETO $bond_pad_8 10
+
+CHOICEPOPUP $choice "Survey center of HDI bond pad 8" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $survey_pad_8
+
+ADD $heater_pad_8 $survey_pad_8 {$wire_bond_length,0.0,0.0}
+COPY $heater_pad_8 {$heater_pad_8.x,$heater_pad_8.y,$heater_focus_z}
+MOVETO $heater_pad_8 10
+
+CHOICEPOPUP $choice "Survey center of heater bond pad 8" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $survey_other_8
+
+ADD $avg_pad_15 $survey_pad_1 $survey_pad_5
+ADD $avg_pad_15 $avg_pad_15 {0.100,0.000,0.000}
+ADD $avg_pad_48 $survey_pad_4 $survey_pad_8
+ADD $avg_pad_48 $avg_pad_48 {-0.100,0.000,0.000}
+SUB $avg_hdi_axis $avg_pad_48 $avg_pad_15
+CALL @UNIT $avg_hdi_axis -> $hdi_u
+
+SUB $delta_pad_1 $survey_pad_1 $survey_other_1
+CALL @DOT $delta_pad_1 $hdi_u -> $slide_1
+PRINT "U1A HDI pad = %v mm" $survey_pad_1
+PRINT "   bond pad = %v mm" $survey_other_1
+PRINT "Wire bond length (U1A - top left) = %f mm (%f mm nominal)" $delta_pad_1.x $nominal_pad_1.x
+PRINT "Slide = %f mm (%f mm nominal)" $slide_1 $nominal_pad_1.y
+
+SUB $delta_pad_4 $survey_pad_4 $survey_other_4
+CALL @DOT $delta_pad_4 $hdi_u -> $slide_4
+PRINT "U1B HDI pad = %v mm" $survey_pad_4
+PRINT "   bond pad = %v mm" $survey_other_4
+PRINT "Wire bond length (U1B - bottom left) = %f mm (%f mm nominal)" $delta_pad_4.x $nominal_pad_4.x
+PRINT "Slide = %f mm (%f mm nominal)" $slide_4 $nominal_pad_4.y
+
+SUB $delta_pad_5 $survey_pad_5 $survey_other_5
+CALL @DOT $delta_pad_5 $hdi_u -> $slide_5
+PRINT "U1C HDI pad = %v mm" $survey_pad_5
+PRINT "   bond pad = %v mm" $survey_other_5
+PRINT "Wire bond length (U1C - top right) = %f mm (%f mm nominal)" $delta_pad_5.x $nominal_pad_5.x
+PRINT "Slide = %f mm (%f mm nominal)" $slide_5 $nominal_pad_5.y
+
+SUB $delta_pad_8 $survey_pad_8 $survey_other_8
+CALL @DOT $delta_pad_8 $hdi_u -> $slide_8
+PRINT "U1D HDI pad = %v mm" $survey_pad_8
+PRINT "   bond pad = %v mm" $survey_other_8
+PRINT "Wire bond length (U1D - bottom right) = %f mm (%f mm nominal)" $delta_pad_8.x $nominal_pad_8.x
+PRINT "Slide = %f mm (%f mm nominal)" $slide_8 $nominal_pad_8.y
+
+SUB $heater_u $survey_other_4 $survey_other_1
+ATAN2 $angle_hdi $hdi_u.y $hdi_u.x
+ATAN2 $angle_heater $heater_u.y $heater_u.x
+SUB $delta_angle $angle_heater $angle_hdi
+PRINT "Angular deviation (left) = %f deg" $delta_angle
+
+SUB $heater_u $survey_other_8 $survey_other_5
+ATAN2 $angle_hdi $hdi_u.y $hdi_u.x
+ATAN2 $angle_heater $heater_u.y $heater_u.x
+SUB $delta_angle $angle_heater $angle_hdi
+PRINT "Angular deviation (right) = %f deg" $delta_angle
+
+COPY $wire_bond_1 {$delta_pad_1.x,$slide_1,0.0}
+COPY $wire_bond_4 {$delta_pad_4.x,$slide_4,0.0}
+COPY $wire_bond_5 {$delta_pad_5.x,$slide_5,0.0}
+COPY $wire_bond_8 {$delta_pad_8.x,$slide_8,0.0}
+
+SUB $delta_slide_1 $slide_1 $nominal_pad_1.y
+SUB $delta_slide_4 $slide_4 $nominal_pad_4.y
+SUB $delta_slide_5 $slide_5 $nominal_pad_5.y
+SUB $delta_slide_8 $slide_8 $nominal_pad_8.y
+ADD $avg_slide $delta_slide_1 $delta_slide_4
+ADD $avg_slide $avg_slide $delta_slide_5
+ADD $avg_slide $avg_slide $delta_slide_8
+MUL $avg_slide $avg_slide 0.25
+SUB $delta_shimmy_1 $delta_pad_1.x $nominal_pad_1.x
+SUB $delta_shimmy_4 $delta_pad_4.x $nominal_pad_4.x
+SUB $delta_shimmy_5 $delta_pad_5.x $nominal_pad_5.x
+SUB $delta_shimmy_8 $delta_pad_8.x $nominal_pad_8.x
+ADD $avg_shimmy $delta_shimmy_1 $delta_shimmy_4
+ADD $avg_shimmy $avg_shimmy $delta_shimmy_5
+ADD $avg_shimmy $avg_shimmy $delta_shimmy_8
+MUL $avg_shimmy $avg_shimmy 0.25
+PRINT "      wire bond pad 1 = %v mm" $wire_bond_1
+PRINT "      wire bond pad 4 = %v mm" $wire_bond_4 
+PRINT "      wire bond pad 5 = %v mm" $wire_bond_5 
+PRINT "      wire bond pad 8 = %v mm" $wire_bond_8
+PRINT "   shimmy/slide pad 1 = %f / %f mm" $delta_shimmy_1 $delta_slide_1
+PRINT "   shimmy/slide pad 4 = %f / %f mm" $delta_shimmy_4 $delta_slide_4
+PRINT "   shimmy/slide pad 5 = %f / %f mm" $delta_shimmy_5 $delta_slide_5
+PRINT "   shimmy/slide pad 8 = %f / %f mm" $delta_shimmy_8 $delta_slide_8
+PRINT "Average shimmy = %f mm" $avg_shimmy
+PRINT "Average slide = %f mm" $avg_slide
+
+CHOICEPOPUP $choice "Turn off chuck vacuum?" "Yes, turn it off" "No, leave it on"
+GOTOIFN @STEP_END $choice
+
+PRINT "Turning off vacuum on chuck %d" $station
+SETVAC croc2x2_chuck_{$station}_tl 0
+SETVAC croc2x2_chuck_{$station}_bl 0
+SETVAC croc2x2_chuck_{$station}_tr 0
+SETVAC croc2x2_chuck_{$station}_br 0
+
+@STEP_END HOME
+END
+
+@STEP_ABORT GETPOS $current_pos
+COPY $safe_z_pos {$current_pos.x,$current_pos.y,10.0}
+MOVETO $safe_z_pos 5
+SETVAC croc_weight_0 0
+SETVAC croc_launchHDI 0
+HOME
+END
+
+@ROTATE(vec,angle)
+  SIN $sinth $angle
+  COS $costh $angle
+  MUL $dxx $vec.x $costh
+  MUL $dxy $vec.y $sinth
+  MUL $dyx $vec.x $sinth
+  MUL $dyy $vec.y $costh
+  COPY $vec {$dxx,$dyy,$vec.z}
+  SUB $vec $vec {$dxy,0.0,0.0}
+  ADD $vec $vec {0.0,$dyx,0.0}
+  RETURN $vec
+
+@UNIT(vec)
+  ABS $len $vec
+  INVERT $rlen $len
+  MUL $u $vec {$rlen,$rlen,0.0}
+  RETURN $u
+
+@DOT(vec1,vec2)
+  MUL $v12 $vec1 $vec2
+  ADD $v $v12.x $v12.y
+  RETURN $v
+  

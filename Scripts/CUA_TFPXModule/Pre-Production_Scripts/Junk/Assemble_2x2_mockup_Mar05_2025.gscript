@@ -1,0 +1,434 @@
+# This script is to assemble a 2x2 thermal mockup.
+#
+# Version 2 provides better documentation and explanation, to match a new SOP
+
+LOADCONFIG
+HOME
+SETLOG "LOG_Assemble_2x2_mockup.txt"
+
+PRINT "Assemble_2x2_mockup Version 1.0 running"
+
+COPY $ghco {0.849228,101.906706,-3.950}
+
+COPY $top_pin_hdi_launch {639.918796,512.390551,63.102000}
+#
+# These are the 2x2 assembly chuck positions, determined using the Calibrate_2x2_Chuck_Offset script
+# angles are in degrees
+#
+COPY $top_pin_chuck_0 {490.256354,511.862306,56.753250}
+COPY $theta_chuck_0 -0.120713
+COPY $top_pin_chuck_1 {490.481727,359.895776,56.913251}
+COPY $theta_chuck_1 0.0090973
+COPY $top_pin_chuck_2 {565.161921,359.715107,56.885333}
+COPY $theta_chuck_2 -0.090199
+COPY $top_pin_chuck_3 {639.996373,360.122438,56.915335}
+COPY $theta_chuck_3 -0.152175
+COPY $top_pin_chuck_4 {714.891606,360.224260,56.902000}
+COPY $theta_chuck_4 0.0087394
+
+
+# bond pad centers on HDI launch pad
+COPY $bond_pad_1 {623.475,523.120,73.197}
+COPY $bond_pad_2 {623.499,544.361,73.197}
+COPY $bond_pad_3 {623.385,544.966,73.197}
+COPY $bond_pad_4 {623.400,566.213,73.197}
+
+COPY $bond_pad_5 {656.596,523.418,73.197}
+COPY $bond_pad_6 {656.630,544.660,73.197}
+COPY $bond_pad_7 {656.515,545.259,73.197}
+COPY $bond_pad_8 {656.531,566.503,73.197}
+
+# fiducials on chip launch pad
+COPY $tm_fid_1 {546.397,516.134,72.897}
+COPY $tm_fid_2 {546.338,537.484,72.897}
+COPY $tm_fid_3 {546.338,537.937,72.897}
+COPY $tm_fid_4 {546.278,559.288,72.897}
+
+COPY $tm_safe_z {0.000,0.000,-50.000}
+COPY $tm_close_z {0.000,0.000,-5.000}
+
+# this controls the position of the chip relative to the HDI
+COPY $wire_bond_length 2.35
+COPY $fiducial_offset 1.41
+COPY $pickup_offset 16.00
+ADD $offset $pickup_offset $fiducial_offset
+SUB $offset $offset $wire_bond_length
+#
+#  This controls the position of the sensor relative to the HDI.
+#  Add the surveyed slide to the y value to adjust.
+#
+COPY $offset_dx {$offset,0.256,0.0}
+
+SETVAC gantry_head_outer 0
+SETVAC gantry_head_inner 0
+SETVAC croc2x2_launchHDI 0
+
+SETVAC croc2x2_launchROC_tl 0
+SETVAC croc2x2_launchROC_bl 0
+SETVAC croc2x2_launchROC_tr 0
+SETVAC croc2x2_launchROC_br 0
+
+@STEP_WEIGHT GETINTPOPUP $station "Which HDI pickup tool? (0-4)"
+GOTOIF @BAD_TOOL `$station<0`
+GOTOIF @BAD_TOOL `$station>4`
+SETVAC croc2x2_weight_{$station} 0
+GOTO @STEP_HDI_LAUNCH
+
+@BAD_TOOL CHOICEPOPUP $trash "Bad number. Try again." "Sorry" "My bad"
+GOTO @STEP_WEIGHT
+
+@STEP_HDI_LAUNCH SETVAC croc2x2_launchHDI 0
+CHOICEPOPUP $choice "Place 2x2 HDI on the launch pad." "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+SETVAC croc2x2_launchHDI 1
+CHOICEPOPUP $choice "Place 2x2 weight tool on HDI." "Yes, continue" "No, go back"
+GOTOIFN @STEP_HDI_LAUNCH $choice
+
+SETVAC croc2x2_weight_{$station} 1
+WAIT 2000
+SETVAC croc2x2_launchHDI 0
+WAIT 2000
+
+MOVETO $top_pin_hdi_launch 100
+
+CHOICEPOPUP $choice "Ready to survey bond pads?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+@SURVEY_PAD1 MOVETO $bond_pad_1 10
+CHOICEPOPUP $choice "Survey pad 1 bottom right corner." "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $pad_1_br
+CHOICEPOPUP $choice "Survey pad 1 top left corner." "Yes, continue" "No, go back"
+GOTOIFN @SURVEY_PAD1 $choice
+
+VIDEO
+GETPOS $pad_1_tl
+ADD $pad_1 $pad_1_br $pad_1_tl
+MUL $pad_1 $pad_1 {0.5,0.5,0.5}
+SUB $pad_1_dx $pad_1 $bond_pad_1
+
+@SURVEY_PAD2 ADD $bond_pad_2 $bond_pad_2 $pad_1_dx
+MOVETO $bond_pad_2 10
+CHOICEPOPUP $choice "Survey pad 2 bottom right corner." "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $pad_2_br
+CHOICEPOPUP $choice "Survey pad 2 top left corner." "Yes, continue" "No, go back"
+GOTOIFN @SURVEY_PAD2 $choice
+
+VIDEO
+GETPOS $pad_2_tl
+ADD $pad_2 $pad_2_br $pad_2_tl
+MUL $pad_2 $pad_2 {0.5,0.5,0.5}
+SUB $pad_2_dx $pad_2 $bond_pad_2
+ADD $pad_2_dx $pad_2_dx $pad_1_dx
+
+@SURVEY_PAD3 ADD $bond_pad_3 $bond_pad_3 $pad_2_dx
+MOVETO $bond_pad_3 10
+CHOICEPOPUP $choice "Survey pad 3 bottom right corner." "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $pad_3_br
+CHOICEPOPUP $choice "Survey pad 3 top left corner." "Yes, continue" "No, go back"
+GOTOIFN @SURVEY_PAD3 $choice
+
+VIDEO
+GETPOS $pad_3_tl
+ADD $pad_3 $pad_3_br $pad_3_tl
+MUL $pad_3 $pad_3 {0.5,0.5,0.5}
+SUB $pad_3_dx $pad_3 $bond_pad_3
+ADD $pad_3_dx $pad_3_dx $pad_2_dx
+
+@SURVEY_PAD4 ADD $bond_pad_4 $bond_pad_4 $pad_3_dx
+ADD $bond_pad_4 $bond_pad_4 {$pad_2_dx.x,0.0,0.0}
+MOVETO $bond_pad_4 10
+CHOICEPOPUP $choice "Survey pad 4 bottom right corner." "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+VIDEO
+GETPOS $pad_4_br
+CHOICEPOPUP $choice "Survey pad 4 top left corner." "Yes, continue" "No, go back"
+GOTOIFN @SURVEY_PAD4 $choice
+
+VIDEO
+GETPOS $pad_4_tl
+ADD $pad_4 $pad_4_br $pad_4_tl
+MUL $pad_4 $pad_4 {0.5,0.5,0.5}
+
+PRINT "HDI pad 1 = %v mm" $pad_1
+PRINT "HDI pad 2 = %v mm" $pad_2
+PRINT "HDI pad 3 = %v mm" $pad_3
+PRINT "HDI pad 4 = %v mm" $pad_4
+
+# FIT $hdi_point $hdi_rot $hdi_residual TFPX_1X2_HDI $pad_1 $pad_2 $pad_3 $pad_4
+# ATAN2 $hdi_theta $hdi_rot.x $hdi_rot.y
+# PRINT "Fitted point on HDI = %v mm" $hdi_point
+# PRINT "Rotation angle = %f deg" $hdi_theta
+# PRINT "Residual = %f mm" $hdi_residual
+
+COPY [0] $pad_1
+ADD [1] $pad_2 {-0.100,0.0,0.0}
+COPY [2] $pad_3
+ADD [3] $pad_4 {-0.100,0.0,0.0}
+FITLINE $hdi_rot $hdi_point $hdi_residual 0 4
+ATAN2 $hdi_theta $hdi_rot.y $hdi_rot.x
+PRINT "Fitted point on bond pad axis = %v mm" $hdi_point
+SUB $res_1 $pad_1 $hdi_point
+CALL @DOT $res_1 $hdi_rot -> $u_1
+SUB $res_2 $pad_2 $hdi_point
+CALL @DOT $res_2 $hdi_rot -> $u_2
+SUB $res_3 $pad_3 $hdi_point
+CALL @DOT $res_3 $hdi_rot -> $u_3
+SUB $res_4 $pad_4 $hdi_point
+CALL @DOT $res_4 $hdi_rot -> $u_4
+PRINT "HDI pad 1 u = %f mm" $u_1
+PRINT "HDI pad 2 u = %f mm" $u_2
+PRINT "HDI pad 3 u = %f mm" $u_3
+PRINT "HDI pad 4 u = %f mm" $u_4
+
+COPY $not_too_big `$hdi_rot.y>0.0`
+GOTOIF @SMALL_ANGLE $not_too_big
+MUL $hdi_rot {-1.0,-1.0,-1.0}
+ATAN2 $hdi_theta $hdi_rot.y $hdi_rot.x
+
+@SMALL_ANGLE
+PRINT "Unit vector on hdi = %v" $hdi_rot
+PRINT "Rotation angle = %f deg" $hdi_theta
+PRINT "Residual = %f mm" $hdi_residual
+
+CHOICEPOPUP $choice "Place 2x2 thermal mockup on chip launchpad" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+SETVAC croc2x2_launchROC_tl 1
+SETVAC croc2x2_launchROC_bl 1
+SETVAC croc2x2_launchROC_tr 1
+SETVAC croc2x2_launchROC_br 1
+
+@SURVEY_FID1 CHOICEPOPUP $choice "Survey fiducial 1." "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+MOVETO $tm_fid_1 20
+VIDEO
+GETPOS $survey_fid_1
+SUB $fid_1_dx $survey_fid_1 $tm_fid_1
+
+@SURVEY_FID2 CHOICEPOPUP $choice "Survey fiducial 2." "Yes, continue" "No, go back"
+GOTOIFN @SURVEY_FID1 $choice
+ADD $tm_fid_2 $tm_fid_2 $fid_1_dx
+MOVETO $tm_fid_2 10
+VIDEO
+GETPOS $survey_fid_2
+SUB $fid_2_dx $survey_fid_2 $tm_fid_2
+ADD $fid_2_dx $fid_2_dx $fid_1_dx
+
+@SURVEY_FID3 CHOICEPOPUP $choice "Survey fiducial 3." "Yes, continue" "No, go back"
+GOTOIFN @SURVEY_FID2 $choice
+ADD $tm_fid_3 $tm_fid_3 $fid_2_dx
+MOVETO $tm_fid_3 10
+VIDEO
+GETPOS $survey_fid_3
+SUB $fid_3_dx $survey_fid_3 $tm_fid_3
+ADD $fid_3_dx $fid_3_dx $fid_2_dx
+
+@SURVEY_FID4 CHOICEPOPUP $choice "Survey fiducial 4." "Yes, continue" "No, go back"
+GOTOIFN @SURVEY_FID3 $choice
+ADD $tm_fid_4 $tm_fid_4 $fid_3_dx
+ADD $tm_fid_4 $tm_fid_4 {$fid_2_dx.x,0.0,0.0}
+MOVETO $tm_fid_4 10
+VIDEO
+GETPOS $survey_fid_4
+
+PRINT "Fiducial 1 = %v mm" $survey_fid_1
+PRINT "Fiducial 2 = %v mm" $survey_fid_2
+PRINT "Fiducial 3 = %v mm" $survey_fid_3
+PRINT "Fiducial 4 = %v mm" $survey_fid_4
+
+COPY [0] $survey_fid_1
+COPY [1] $survey_fid_2
+COPY [2] $survey_fid_3
+COPY [3] $survey_fid_4
+FITLINE $heater_rot $heater_point $heater_residual 0 4
+ATAN2 $heater_theta $heater_rot.y $heater_rot.x
+PRINT "Fitted point on fiducial axis = %v mm" $heater_point
+PRINT "Unit vector on heater axis = %v" $heater_rot
+PRINT "Rotation angle = %f deg" $heater_theta
+PRINT "Residual = %f mm" $heater_residual
+
+PRINT "HDI axis = %v" $hdi_rot
+SUB $delta_theta $heater_theta $hdi_theta
+CALL @ROTATE $heater_rot $delta_theta -> $new_heater_rot
+PRINT "Rotated heater axis = %v" $new_heater_rot
+
+# Calculate pick-up point on heater
+COPY $pickup_dx {$heater_rot.y,$heater_rot.x,0.0}
+MUL $pickup_dx $pickup_dx {1.0,-1.0,0.0}
+MUL $pickup_dx $pickup_dx {$pickup_offset,$pickup_offset,0.0}
+ADD $pickup_point $heater_point $pickup_dx
+PRINT "Heater pickup point = %v mm" $pickup_point
+ADD $pickup_point $pickup_point $ghco
+ADD $safe_pickup_point $pickup_point {0.000,0.000,-2.000}
+ADD $safer_pickup_point $pickup_point {0.000,0.000,-50.000}
+
+
+@STEP_PROMPT GETINTPOPUP $station "Which assembly chuck? (0-4)"
+GOTOIF @DISPLAY_ERROR `$station<0`
+GOTOIF @STATION_0 `$station<1`
+GOTOIF @STATION_1 `$station<2`
+GOTOIF @STATION_2 `$station<3`
+GOTOIF @STATION_3 `$station<4`
+GOTOIF @STATION_4 `$station<5`
+@DISPLAY_ERROR CHOICEPOPUP $trash "Bad number. Try again." "Sorry" "My bad"
+GOTO @STEP_PROMPT
+
+@STATION_0 COPY $theta_chuck $theta_chuck_0
+COPY $top_pin_chuck $top_pin_chuck_0
+GOTO @MOVE_PART
+
+@STATION_1 COPY $theta_chuck $theta_chuck_1
+COPY $top_pin_chuck $top_pin_chuck_1
+GOTO @MOVE_PART
+
+@STATION_2 COPY $theta_chuck $theta_chuck_2
+COPY $top_pin_chuck $top_pin_chuck_2
+GOTO @MOVE_PART
+
+@STATION_3 COPY $theta_chuck $theta_chuck_3
+COPY $top_pin_chuck $top_pin_chuck_3
+GOTO @MOVE_PART
+
+@STATION_4 COPY $theta_chuck $theta_chuck_4
+COPY $top_pin_chuck $top_pin_chuck_4
+
+CHOICEPOPUP $choice "Ready to pick up the part?" "Yes, continue" "No, abort"
+GOTOIFN @STEP_ABORT $choice
+
+MOVENAME tool_rack_pos_2_out 200
+LOADTOOL picker_tool
+MOVETO $safer_pickup_point 100
+
+@PICK_IT_UP SETVAC gantry_head_inner 0
+SETVAC croc2x2_chuck_{$station}_tl 0
+SETVAC croc2x2_chuck_{$station}_tr 0
+SETVAC croc2x2_chuck_{$station}_bl 0
+SETVAC croc2x2_chuck_{$station}_br 0
+SETVAC croc2x2_launchROC_tl 1
+SETVAC croc2x2_launchROC_tr 1
+SETVAC croc2x2_launchROC_bl 1
+SETVAC croc2x2_launchROC_br 1
+MOVETO $safe_pickup_point 10
+MOVETO $pickup_point 0.5
+SETVAC gantry_head_inner 1
+WAIT 1000
+SETVAC croc2x2_launchROC_tl 0
+SETVAC croc2x2_launchROC_tr 0
+SETVAC croc2x2_launchROC_bl 0
+SETVAC croc2x2_launchROC_br 0
+WAIT 3000
+MOVETO $safe_pickup_point 0.5
+MOVETO $safer_pickup_point 10
+
+# CHOICEPOPUP $choice "Did it pick up the part?" "Yes, continue" "No, abort"
+# GOTOIFN @PICK_IT_UP $choice
+
+@MOVE_PART SUB $hdi_dx $hdi_point $top_pin_hdi_launch
+CALL @ROTATE $hdi_dx $theta_chuck -> $new_hdi_point
+ADD $new_hdi_point $new_hdi_point $top_pin_chuck
+PRINT "New HDI point (ROTATE) = %v mm" $new_hdi_point
+
+SIN $sinth $theta_chuck
+COS $costh $theta_chuck
+MUL $dxx $hdi_dx.x $costh
+MUL $dxy $hdi_dx.y $sinth
+MUL $dyx $hdi_dx.x $sinth
+MUL $dyy $hdi_dx.y $costh
+COPY $dx {$dxx,$dyy,0.0}
+SUB $dx $dx {$dxy,0.0,0.0}
+ADD $dx $dx {0.0,$dyx,0.0}
+ADD $new_hdi_point $top_pin_chuck $dx
+PRINT "New point on HDI = %v mm" $new_hdi_point
+
+ADD $hdi_theta $hdi_theta $theta_chuck
+CALL @ROTATE $offset_dx $hdi_theta -> $drop_point
+ADD $drop_point $drop_point $new_hdi_point
+PRINT "Drop point (ROTATE) = %v" $drop_point
+
+SIN $sinth $hdi_theta
+COS $costh $hdi_theta
+MUL $dxx $offset_dx.x $costh
+MUL $dxy $offset_dx.y $sinth
+MUL $dyx $offset_dx.x $sinth
+MUL $dyy $offset_dx.y $costh
+COPY $dx {$dxx,$dyy,0.0}
+SUB $dx $dx {$dxy,0.0,0.0}
+ADD $dx $dx {0.0,$dyx,0.0}
+ADD $drop_point $new_hdi_point $dx
+COPY $drop_point {$drop_point.x,$drop_point.y,$heater_point.z}
+# thickness of assembly carrier
+SUB $drop_point $drop_point {0.0,0.0,6.400}
+PRINT "Camera drop point = %v mm" $drop_point
+ADD $drop_point $drop_point $ghco
+PRINT "Gantry drop point = %v mm" $drop_point
+
+SETVAC croc_chuck_{$station}_top 0
+SETVAC croc_chuck_{$station}_bot 0
+
+GETPOS $pos
+COPY $pos.z 10
+MOVETO $pos 10
+SUB $safe_drop_point $drop_point {0.000,0.000,1.000}
+COPY $safer_drop_point {$drop_point.x,$drop_point.y,$safer_pickup_point.z}
+ADD $angle $delta_theta $theta_chuck
+PRINT "Rotating heater by %f degrees" $angle
+ROTATETO $angle 2
+MOVETO $safer_drop_point 40
+MOVETO $safe_drop_point 5
+MOVETO $drop_point 2
+
+SETVAC croc2x2_chuck_{$station}_tl 1
+SETVAC croc2x2_chuck_{$station}_bl 1
+SETVAC croc2x2_chuck_{$station}_tr 1
+SETVAC croc2x2_chuck_{$station}_br 1
+WAIT 1000
+SETVAC gantry_head_inner 0
+WAIT 4000
+MOVETO $safe_drop_point 1
+MOVETO $safer_drop_point 10
+ROTATETO 0 5
+
+MOVENAME tool_rack_pos_2_out 100
+UNLOADTOOL picker_tool
+
+HOME
+PRINT "Done!"
+
+END
+
+@STEP_ABORT GETPOS $current_pos
+COPY $safe_z_pos {$current_pos.x,$current_pos.y,10.0}
+MOVETO $safe_z_pos 5
+SETVAC croc2x2_weight_0 0
+SETVAC croc2x2_launchHDI 0
+HOME
+END
+
+@ROTATE(vec,angle)
+  SIN $sinth $angle
+  COS $costh $angle
+  MUL $dxx $vec.x $costh
+  MUL $dxy $vec.y $sinth
+  MUL $dyx $vec.x $sinth
+  MUL $dyy $vec.y $costh
+  COPY $vec {$dxx,$dyy,$vec.z}
+  SUB $vec $vec {$dxy,0.0,0.0}
+  ADD $vec $vec {0.0,$dyx,0.0}
+  RETURN $vec
+
+@DOT(vec1,vec2)
+  MUL $v12 $vec1 $vec2
+  ADD $v $v12.x $v12.y
+  RETURN $v
+

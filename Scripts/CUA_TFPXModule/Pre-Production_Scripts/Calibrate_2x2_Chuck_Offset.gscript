@@ -1,0 +1,288 @@
+# This script is to measure displacements between HDI launch pad and assembly chucks
+#
+# This version provides better documentation and explanation, to match a new SOP
+#
+# Version 1.00 should have been uploaded to GIT at the end of March.
+# Here is a summary of changes since then:
+#
+# Version 1.10 - April 7, 2025
+#                * Moves camera to expected edge of hole rather than center
+
+LOADCONFIG
+HOME
+SETLOG "LOG_Calibrate_2x2_Chuck.txt"
+PRINT "Calibrate_2x2_Chuck_Offset v1.10 running"
+
+COPY $hdi_launch_pin_height 7.6132
+COPY $pin_hole_radius 1.10
+#
+#  These are determined from the Initial_Gantry_Survey script
+#  They should be read from the flex-config file
+#
+COPY $bolt_hole_origin {-83.365090,625.414110,92.520000}
+
+COPY $top_pin_2x2_hdi_launch {639.831416,512.336633,63.295000}
+COPY $bottom_pin_2x2_hdi_launch {639.6579879,587.366970,63.222000}
+COPY $theta_2x2_hdi_launch 0.115719
+
+COPY $focus_1x2_hdi_launch 73.470000
+COPY $focus_1x2_chip_launch 73.470000
+COPY $focus_1x2_chuck_0 67.120000
+COPY $focus_1x2_chuck_1 67.074999
+COPY $focus_1x2_chuck_2 67.090000
+COPY $focus_1x2_chuck_3 67.085000
+COPY $focus_1x2_chuck_4 67.100000
+COPY $focus_2x2_hdi_launch 73.585000
+COPY $focus_2x2_chip_launch 73.510000
+COPY $focus_2x2_chuck_0 67.110000
+COPY $focus_2x2_chuck_1 67.200001
+COPY $focus_2x2_chuck_2 67.244999
+COPY $focus_2x2_chuck_3 67.340000
+COPY $focus_2x2_chuck_4 67.440000
+
+#
+#  Nominal chuck offset positions
+#
+COPY $chuck_offset_0 {-150.000,0.000,-6.100}
+COPY $chuck_offset_1 {-150.000,-152.538,-6.100}
+COPY $chuck_offset_2 {-75.000,-152.538,-6.100}
+COPY $chuck_offset_3 {0.000,-152.538,-6.100}
+COPY $chuck_offset_4 {75.000,-152.538,-6.100}
+COPY $bottom_pin_offset {0.000,75.000,0.000}
+
+#
+#  Calculate nominal position of bottom pin if you do not already know it.
+#
+# ADD $bottom_pin_2x2_hdi_launch $top_pin_2x2_hdi_launch $bottom_pin_offset
+# COPY $theta_2x2_hdi_launch 0.000000
+
+ADD $top_pin_chuck_0 $top_pin_2x2_hdi_launch $chuck_offset_0
+ADD $bottom_pin_chuck_0 $bottom_pin_2x2_hdi_launch $chuck_offset_0
+COPY $theta_chuck_0 0.000000
+
+ADD $top_pin_chuck_1 $top_pin_2x2_hdi_launch $chuck_offset_1
+ADD $bottom_pin_chuck_1 $bottom_pin_2x2_hdi_launch $chuck_offset_1
+COPY $theta_chuck_1 0.000000
+
+ADD $top_pin_chuck_2 $top_pin_2x2_hdi_launch $chuck_offset_2
+ADD $bottom_pin_chuck_2 $bottom_pin_2x2_hdi_launch $chuck_offset_2
+COPY $theta_chuck_2 0.000000
+
+ADD $top_pin_chuck_3 $top_pin_2x2_hdi_launch $chuck_offset_3
+ADD $bottom_pin_chuck_3 $bottom_pin_2x2_hdi_launch $chuck_offset_3
+COPY $theta_chuck_3 0.000000
+
+ADD $top_pin_chuck_4 $top_pin_2x2_hdi_launch $chuck_offset_4
+ADD $bottom_pin_chuck_4 $bottom_pin_2x2_hdi_launch $chuck_offset_4
+COPY $theta_chuck_4 0.000000
+
+#
+#  These are determined from this script.
+#  They are used in subsequent scripts, but not this one.
+#
+COPY $top_pin_chuck_0 {490.186853,511.794159,60.785998}
+COPY $bottom_pin_chuck_0 {490.209731,586.774444,60.448998}
+COPY $theta_chuck_0 -0.133200
+
+COPY $top_pin_chuck_1 {490.421774,359.816105,61.431998}
+COPY $bottom_pin_chuck_1 {490.265913,434.823138,61.233998}
+COPY $theta_chuck_1 0.005018
+
+COPY $top_pin_chuck_2 {565.091122,359.650459,61.311998}
+COPY $bottom_pin_chuck_2 {565.097347,434.584713,61.296998}
+COPY $theta_chuck_2 -0.118799
+
+COPY $top_pin_chuck_3 {639.902254,360.061791,61.395998}
+COPY $bottom_pin_chuck_3 {639.917396,435.048464,61.435998}
+COPY $theta_chuck_3 -0.125609
+
+COPY $top_pin_chuck_4 {714.717145,360.144413,61.508998}
+COPY $bottom_pin_chuck_4 {714.579482,435.038551,61.544998}
+COPY $theta_chuck_4 -0.008723
+
+COPY $safe_z 10.000
+
+SETVAC gantry_head_outer 0
+SETVAC gantry_head_inner 0
+SETVAC croc_launchHDI 0
+SETVAC croc_weight_0 0
+
+COPY $safe_top_pin {$top_pin_2x2_hdi_launch.x,$top_pin_2x2_hdi_launch.y,$safe_z}
+MOVETO $safe_top_pin 100
+MOVETO $top_pin_2x2_hdi_launch 10
+
+@FIND_HDI_PIN CHOICEPOPUP $choice "Ready to survey top pin on HDI launch pad?" "Yes, continue" "No, skip"
+GOTOIF @START_HDI_TOP $choice
+COPY $center_top_pin_hdi_launch $top_pin_2x2_hdi_launch
+GOTO @GOT_TOP_PIN
+
+@START_HDI_TOP MOVETO $top_pin_2x2_hdi_launch 100
+SUB $edge_of_hole $top_pin_2x2_hdi_launch {$pin_hole_radius,0.000,0.000}
+MOVETO $edge_of_hole 20
+COPY $i 0
+@GET_POINT_HDI_TOP VIDEO
+GETPOS [$i]
+ADD $i $i 1
+CHOICEPOPUP $choice "Survey more points?" "Yes, continue." "No, fit circle."
+GOTOIF @GET_POINT_HDI_TOP $choice
+FITCIRCLE $center_top_pin_hdi_launch $radius $residual 0 $i
+
+CHOICEPOPUP $choice "Satisfactory fit?" "Yes, continue." "No, try again."
+GOTOIFN @START_HDI_TOP $choice
+
+@GOT_TOP_PIN PRINT "HDI launch pad top pin = %v mm" $center_top_pin_hdi_launch
+SUB $delta_pin $center_top_pin_hdi_launch $top_pin_2x2_hdi_launch
+PRINT "Change in surveyed pin location = %v mm" $delta_pin
+
+CHOICEPOPUP $choice "Survey bottom pin on HDI launch pad?" "Yes, continue" "No, skip"
+GOTOIF @START_HDI_BOTTOM $choice
+COPY $center_bottom_pin_hdi_launch $bottom_pin_2x2_hdi_launch
+GOTO @GOT_BOTTOM_PIN
+
+@START_HDI_BOTTOM MOVETO $bottom_pin_2x2_hdi_launch 100
+SUB $edge_of_hole $bottom_pin_2x2_hdi_launch {$pin_hole_radius,0.000,0.000}
+MOVETO $edge_of_hole 20
+COPY $i 0
+@GET_POINT_HDI_BOTTOM VIDEO
+GETPOS [$i]
+ADD $i $i 1
+CHOICEPOPUP $choice "Survey more points?" "Yes, continue." "No, fit circle."
+GOTOIF @GET_POINT_HDI_BOTTOM $choice
+FITCIRCLE $center_bottom_pin_hdi_launch $radius $residual 0 $i
+
+CHOICEPOPUP $choice "Satisfactory fit?" "Yes, continue." "No, try again."
+GOTOIFN @START_HDI_BOTTOM $choice
+
+@GOT_BOTTOM_PIN PRINT "HDI launch pad bottom pin = %v mm" $center_bottom_pin_hdi_launch
+SUB $delta_pin $center_bottom_pin_hdi_launch $bottom_pin_2x2_hdi_launch
+PRINT "Change in surveyed pin location = %v mm" $delta_pin
+
+SUB $delta_pin $center_bottom_pin_hdi_launch $center_top_pin_hdi_launch
+ATAN2 $theta_hdi_launch $delta_pin.y $delta_pin.x
+MUL $theta_hdi_launch $theta_hdi_launch -1.000
+PRINT "Rotation angle of HDI launch pad = %f deg" $theta_hdi_launch
+
+CHOICEPOPUP $choice "Write 2x2 HDI launch pad pin locations to flex-config file?" "Yes, continue" "No, skip."
+GOTOIFN @STEP_PROMPT $choice
+
+PRINT "Write to flex-config top_pin_2x2_hdi_launch = %v mm" $center_top_pin_hdi_launch
+PRINT "Write to flex-config bottom_pin_2x2_hdi_launch = %v mm" $center_bottom_pin_hdi_launch
+PRINT "Write to flex-config theta_2x2_hdi_launch = %f deg" $theta_hdi_launch
+
+@STEP_PROMPT GETINTPOPUP $station "Which assembly chuck? (0-4)"
+GOTOIF @DISPLAY_ERROR `$station<0`
+GOTOIF @STATION_0 `$station<1`
+GOTOIF @STATION_1 `$station<2`
+GOTOIF @STATION_2 `$station<3`
+GOTOIF @STATION_3 `$station<4`
+GOTOIF @STATION_4 `$station<5`
+@DISPLAY_ERROR CHOICEPOPUP $trash "Bad number. Try again." "Sorry" "My bad"
+GOTO @STEP_PROMPT
+
+@STATION_0 PRINT "Surveying chuck 0..."
+COPY $top_pin $top_pin_chuck_0
+ADD $bottom_pin $top_pin $bottom_pin_offset
+COPY $theta $theta_chuck_0
+GOTO @SURVEY_CHUCK_TOP
+
+@STATION_1 PRINT "Surveying chuck 1..."
+COPY $top_pin $top_pin_chuck_1
+ADD $bottom_pin $top_pin $bottom_pin_offset
+COPY $theta $theta_chuck_1
+GOTO @SURVEY_CHUCK_TOP
+
+@STATION_2 PRINT "Surveying chuck 2..."
+COPY $top_pin $top_pin_chuck_2
+ADD $bottom_pin $top_pin $bottom_pin_offset
+COPY $theta $theta_chuck_2
+GOTO @SURVEY_CHUCK_TOP
+
+@STATION_3 PRINT "Surveying chuck 3..."
+COPY $top_pin $top_pin_chuck_3
+ADD $bottom_pin $top_pin $bottom_pin_offset
+COPY $theta $theta_chuck_3
+GOTO @SURVEY_CHUCK_TOP
+
+@STATION_4 PRINT "Surveying chuck 4..."
+COPY $top_pin $top_pin_chuck_4
+ADD $bottom_pin $top_pin $bottom_pin_offset
+COPY $theta $theta_chuck_4
+GOTO @SURVEY_CHUCK_TOP
+
+@SURVEY_CHUCK_TOP MOVETO $top_pin 50
+CHOICEPOPUP $choice "Survey top pin?" "Yes, continue." "No, skip."
+GOTOIF @SURVEY_TOP_PIN $choice
+COPY $center_top_pin_chuck $top_pin
+GOTO @SURVEY_BOTTOM_PIN
+
+@SURVEY_TOP_PIN COPY $i 0
+SUB $edge_of_hole $top_pin {$pin_hole_radius,0.000,0.000}
+MOVETO $edge_of_hole 20
+@GET_POINT_TOP_PIN VIDEO
+GETPOS [$i]
+ADD $i $i 1
+CHOICEPOPUP $choice "Survey more points?" "Yes, continue." "No, fit circle."
+GOTOIF @GET_POINT_TOP_PIN $choice
+FITCIRCLE $center_top_pin_chuck $radius $residual 0 $i
+
+CHOICEPOPUP $choice "Satisfactory fit?" "Yes, continue." "No, try again."
+GOTOIFN @SURVEY_TOP_PIN $choice
+
+PRINT "Chuck %d top pin = %v mm" $station $center_top_pin_chuck
+SUB $delta_pin $center_top_pin_chuck $top_pin
+PRINT "Change in surveyed pin location = %v mm" $delta_pin
+
+@SURVEY_CHUCK_BOTTOM MOVETO $bottom_pin 50
+CHOICEPOPUP $choice "Survey bottom pin?" "Yes, continue." "No, skip."
+GOTOIF @SURVEY_BOTTOM_PIN $choice
+COPY $center_bottom_pin_chuck $bottom_pin
+GOTO @FINISHED
+
+@SURVEY_BOTTOM_PIN COPY $i 0
+SUB $edge_of_hole $bottom_pin {$pin_hole_radius,0.000,0.000}
+MOVETO $edge_of_hole 20
+@GET_POINT_BOTTOM_PIN VIDEO
+GETPOS [$i]
+ADD $i $i 1
+CHOICEPOPUP $choice "Survey more points?" "Yes, continue." "No, fit circle."
+GOTOIF @GET_POINT_BOTTOM_PIN $choice
+FITCIRCLE $center_bottom_pin_chuck $radius $residual 0 $i
+
+CHOICEPOPUP $choice "Satisfactory fit?" "Yes, continue." "No, try again."
+GOTOIFN @SURVEY_BOTTOM_PIN $choice
+
+@FINISHED PRINT "Chuck %d bottom pin = %v mm" $station $center_bottom_pin_chuck
+SUB $delta_pin $center_bottom_pin_chuck $bottom_pin
+PRINT "Change in surveyed pin location = %v mm" $delta_pin
+
+SUB $delta_pin $center_bottom_pin_chuck $center_top_pin_chuck
+ATAN2 $theta_chuck $delta_pin.y $delta_pin.x
+MUL $theta_chuck $theta_chuck -1.000
+PRINT "Rotation angle of chuck %d = %f deg" $station $theta_chuck
+
+SUB $theta_chuck $theta_chuck $theta_hdi_launch
+PRINT "Incremental rotation from HDI launchpad = %f deg" $theta_chuck
+
+CHOICEPOPUP $choice "Write pin locations to flex-config file?" "Yes, continue" "No, skip"
+GOTOIFN @ALL_DONE $choice
+
+PRINT "Write to flex-config top_pin_chuck_%d = %v mm" $station $center_top_pin_chuck
+PRINT "Write to flex-config bottom_pin_chuck_%d = %v mm" $station $center_bottom_pin_chuck
+PRINT "Write to flex-config theta_chuck_%d = %f deg" $station $theta_chuck
+
+@ALL_DONE HOME
+END
+
+
+@ROTATE(vec,angle)
+  SIN $sinth $angle
+  COS $costh $angle
+  MUL $dxx $vec.x $costh
+  MUL $dxy $vec.y $sinth
+  MUL $dyx $vec.x $sinth
+  MUL $dyy $vec.y $costh
+  COPY $vec {$dxx,$dyy,$vec.z}
+  SUB $vec $vec {$dxy,0.0,0.0}
+  ADD $vec $vec {0.0,$dyx,0.0}
+  RETURN $vec
+

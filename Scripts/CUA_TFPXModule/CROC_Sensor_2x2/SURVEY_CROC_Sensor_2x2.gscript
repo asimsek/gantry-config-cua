@@ -92,15 +92,12 @@ PRINT "Avg(Avg(delta(Y))): %f" $avgY_tot
 
 HOME
 
+
   # Step 18. End program with vacuums on or off
-@STEP_SEVENTEEN PASS
-CHOICEPOPUP $choice "Has the glue been cured according to the sample previously set aside?" "Yes" "No"
-GOTOIFN @STEP_SEVENTEEN $choice
+CHOICEPOPUP $choice "Do you want to leave the vacuums on?" "Yes, leave them on" "No, turn them off"
+GOTOIF @STEP_END $choice
 
 SETVAC croc2x2_weight_{$station} 0
-
-CHOICEPOPUP $choice "Have you moved the weight tool back to its home position?" "Yes" "No"
-GOTOIFN @STEP_SEVENTEEN $choice
 
 GOTOIF @SINGLEVAC `$station>0`
 
@@ -114,6 +111,7 @@ GOTO @STEP_END
 SETVAC "croc2x2_chuck_{$station}" 0
 
 @STEP_END END
+
 
 # SURVEYPOS
 # Arguments:

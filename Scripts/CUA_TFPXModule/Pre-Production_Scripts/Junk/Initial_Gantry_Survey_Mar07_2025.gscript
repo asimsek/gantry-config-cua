@@ -1,0 +1,376 @@
+# This script does the initial survey of a gantry system.
+# The intent is to minimize site dependencies in the subsequent scripts.
+#
+# Version 2 provides better documentation and explanation, to match a new SOP
+
+LOADCONFIG
+HOME
+SETLOG "LOG_Initial_Survey.txt"
+PRINT "Initial_Gantry_Survey v1.00 running..."
+
+#
+#  These are all the values that should be read from the flex-config file
+#  They could, in principle, be different for each assembly site
+#
+COPY $bolt_hole_origin {-83.344202,625.402629,92.546666}
+COPY $top_pin_1x2_hdi_launch {170.042404,516.847365,65.171666}
+COPY $top_pin_2x2_hdi_launch {639.848242,512.320331,63.341665}
+COPY $focus_1x2_hdi_launch 73.466666
+COPY $focus_1x2_chip_launch 73.516666
+COPY $focus_1x2_chuck_0 67.141665
+COPY $focus_1x2_chuck_1 67.086666
+COPY $focus_1x2_chuck_2 67.096667
+COPY $focus_1x2_chuck_3 67.081665
+COPY $focus_1x2_chuck_4 67.061666
+COPY $focus_2x2_hdi_launch 73.631666
+COPY $focus_2x2_chip_launch 73.581666
+COPY $focus_2x2_chuck_0 67.131666
+COPY $focus_2x2_chuck_1 67.276667
+COPY $focus_2x2_chuck_2 67.311665
+COPY $focus_2x2_chuck_3 67.366667
+COPY $focus_2x2_chuck_4 67.506666
+
+#
+#  Nominal values are calculated from the design geometry
+#  They are the same for all assembly sites
+#
+COPY $nominal_1x2_hdi_pin_offset {101.000,-108.5,-27.3}  # top pin relative to front left mounting hole
+COPY $nominal_2x2_hdi_pin_offset {113.700,-113.0,-29.3}
+
+COPY $nominal_1x2_offset_0 {-100.000,0.000,0.000}
+COPY $nominal_1x2_offset_1 {-100.000,-152.538,0.000}
+COPY $nominal_1x2_offset_2 {-50.000,-152.538,0.000}
+COPY $nominal_1x2_offset_3 {0.000,-152.538,0.000}
+COPY $nominal_1x2_offset_4 {50.000,-152.538,0.000}
+COPY $nominal_1x2_center {0.0,32.500,0.000}
+COPY $nominal_2x2_offset_0 {-150.000,0.000,0.000}
+COPY $nominal_2x2_offset_1 {-150.000,-152.538,0.000}
+COPY $nominal_2x2_offset_2 {-75.000,-152.538,0.000}
+COPY $nominal_2x2_offset_3 {0.000,-152.538,0.000}
+COPY $nominal_2x2_offset_4 {75.000,-152.538,0.000}
+COPY $nominal_1x2_chuck_center {0.000,32.500,0.000}   # relative to top alignment pin
+COPY $nominal_2x2_chuck_center {0.000,37.500,0.000}
+COPY $nominal_chuck_height 19.05
+COPY $nominal_carrier_height 25.40
+
+COPY $safe_z 10.000
+COPY $close_z 50.000
+
+SETVAC gantry_head_outer 0
+SETVAC gantry_head_inner 0
+SETVAC croc_launchHDI 0
+SETVAC croc_weight_0 0
+
+@WHICH_HOLE
+GETINTPOPUP $hole_i "Front-left mounting hole X index? (0-6)"
+GETINTPOPUP $hole_j "Front-left mounting hole Y index? (0-2)"
+
+# bolt holes are spaced by 6 inches
+
+MUL $hole_i $hole_i 6.0
+MUL $hole_i $hole_i 25.4
+ADD $hole_x $hole_i $bolt_hole_origin.x
+MUL $hole_j $hole_j 6.0
+MUL $hole_j $hole_j 25.4
+SUB $hole_y $bolt_hole_origin.y $hole_j
+COPY $bolt_hole {$hole_x,$hole_y,0.0}
+
+PRINT "Expecting to find front-left bolt hole at %v mm" $bolt_hole
+COPY $check_hole {$bolt_hole.x,$bolt_hole.y,$safe_z}
+MOVETO $check_hole 100
+
+CHOICEPOPUP $choice "Is this the front-left mounting hole?" "Yes, continue." "No, try again."
+GOTOIFN @WHICH_HOLE $choice
+
+@FIT_BOLT_HOLE CHOICEPOPUP $choice "Ready to survey bolt hole?" "Yes, continue" "No, skip"
+GOTOIFN @SURVEY_1X2 $choice
+
+COPY $survey_hole {$bolt_hole.x,$bolt_hole.y,$close_z}
+
+@SURVEY_BOLT_HOLE MOVETO $survey_hole 5
+CALL @SURVEY_CIRCLE -> $center_bolt_hole
+
+SUB $hole_x $center_bolt_hole.x $hole_i
+ADD $hole_y $center_bolt_hole.y $hole_j
+COPY $new_bolt_hole_origin {$hole_x,$hole_y,$center_bolt_hole.z}
+PRINT "Bolt hole pattern origin = %v mm" $new_bolt_hole_origin
+SUB $delta_bolt_hole_origin $new_bolt_hole_origin $bolt_hole_origin
+PRINT "Change from previous value = %v mm" $delta_bolt_hole_origin
+
+CHOICEPOPUP $choice "Update flex-config file?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_BOLT_HOLE $choice
+
+COPY $bolt_hole_origin $new_bolt_hole_origin
+PRINT "Write to flex-config bolt_hole_origin = %v mm" $bolt_hole_origin
+
+
+@SURVEY_1X2 CHOICEPOPUP $choice "Ready to survey top pin on 1x2 HDI launch pad?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_2X2 $choice
+
+GETINTPOPUP $hole_i "Front-left mounting hole of 1x2 tooling X index? (0-6)"
+GETINTPOPUP $hole_j "Front-left mounting hole of 1x2 tooling Y index? (0-2)"
+MUL $hole_i $hole_i 6.0
+MUL $hole_i $hole_i 25.4
+ADD $hole_x $hole_i $bolt_hole_origin.x
+MUL $hole_j $hole_j 6.0
+MUL $hole_j $hole_j 25.4
+SUB $hole_y $bolt_hole_origin.y $hole_j
+ADD $survey_1x2_top_pin {$hole_x,$hole_y,$bolt_hole_origin.z} $nominal_1x2_hdi_pin_offset
+
+COPY $close_1x2_top_pin {$survey_1x2_top_pin.x,$survey_1x2_top_pin.y,$close_z}
+MOVETO $close_1x2_top_pin 100
+
+@SURVEY_1X2_PIN MOVETO $survey_1x2_top_pin 5
+CALL @SURVEY_CIRCLE -> $center_1x2_pin
+
+PRINT "1x2 HDI launch pad pin center = %v mm" $center_1x2_pin
+SUB $delta_1x2_pin $center_1x2_pin $top_pin_1x2_hdi_launch
+PRINT "Change from previous value = %v mm" $delta_1x2_pin
+
+CHOICEPOPUP $choice "Update flex-config file?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_BOLT_HOLE $choice
+
+COPY $top_pin_1x2_hdi_launch $center_1x2_pin
+PRINT "Write to flex-config top_pin_1x2_hdi_launch = %v mm" $top_pin_1x2_hdi_launch
+
+@SURVEY_2X2 CHOICEPOPUP $choice "Ready to survey top pin on 2x2 HDI launch pad?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_1X2_Z $choice
+
+GETINTPOPUP $hole_i "Front-left mounting hole of 2x2 tooling X index? (0-6)"
+GETINTPOPUP $hole_j "Front-left mounting hole of 2x2 tooling Y index? (0-2)"
+MUL $hole_i $hole_i 6.0
+MUL $hole_i $hole_i 25.4
+ADD $hole_x $hole_i $bolt_hole_origin.x
+MUL $hole_j $hole_j 6.0
+MUL $hole_j $hole_j 25.4
+SUB $hole_y $bolt_hole_origin.y $hole_j
+ADD $survey_2x2_top_pin {$hole_x,$hole_y,$bolt_hole_origin.z} $nominal_2x2_hdi_pin_offset
+
+COPY $close_2x2_top_pin {$survey_2x2_top_pin.x,$survey_2x2_top_pin.y,$close_z}
+MOVETO $close_2x2_top_pin 100
+
+@SURVEY_1X2_PIN MOVETO $survey_2x2_top_pin 5
+CALL @SURVEY_CIRCLE -> $center_2x2_pin
+
+PRINT "2x2 HDI launch pad pin center = %v mm" $center_2x2_pin
+SUB $delta_2x2_pin $center_2x2_pin $top_pin_2x2_hdi_launch
+PRINT "Change from previous value = %v mm" $delta_2x2_pin
+
+CHOICEPOPUP $choice "Update flex-config file?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_BOLT_HOLE $choice
+
+COPY $top_pin_2x2_hdi_launch $center_2x2_pin
+PRINT "Write to flex-config top_pin_2x2_hdi_launch = %v mm" $top_pin_2x2_hdi_launch
+
+@SURVEY_1X2_Z CHOICEPOPUP $choice "Ready to survey height of 1x2 tooling?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_2X2_Z $choice
+
+MOVETO $top_pin_1x2_hdi_launch 100
+
+CHOICEPOPUP $choice "Measure height of 1x2 HDI launch pad surface?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_1X2_CHIP_Z $choice
+
+ADD $center_1x2_hdi_launch $top_pin_1x2_hdi_launch $nominal_1x2_chuck_center
+COPY $center_1x2_hdi_launch {$center_1x2_hdi_launch.x,$center_1x2_hdi_launch.y,$bolt_hole_origin.z}
+SUB $center_1x2_hdi_launch $center_1x2_hdi_launch {0.000,0.000,$nominal_chuck_height}
+
+MOVETO $center_1x2_hdi_launch 50
+
+VIDEO
+GETPOS $pos
+COPY $focus_1x2_hdi_launch $pos.z
+PRINT "New 1x2 HDI launch pad focus z = %f" $focus_1x2_hdi_launch
+
+@SURVEY_1X2_CHIP_Z CHOICEPOPUP $choice "Measure height of 1x2 chip launch pad surface?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_1X2_CHUCK_0_Z $choice
+ADD $center_1x2_chip_launch $top_pin_1x2_hdi_launch {-50.000,0.000,0.000}
+ADD $center_1x2_chip_launch $center_1x2_chip_launch $nominal_1x2_chuck_center
+COPY $center_1x2_chip_launch {$center_1x2_chip_launch.x,$center_1x2_chip_launch.y,$bolt_hole_origin.z}
+SUB $center_1x2_chip_launch $center_1x2_chip_launch {0.000,0.000,$nominal_chuck_height}
+MOVETO $center_1x2_chip_launch 50
+VIDEO
+GETPOS $pos
+COPY $focus_1x2_chip_launch $pos.z
+PRINT "New 1x2 chip launch pad focus z = %f" $focus_1x2_chip_launch
+
+@SURVEY_1X2_CHUCK_0_Z CHOICEPOPUP $choice "Measure height of 1x2 chuck 0?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_1X2_CHUCK_1_Z $choice
+ADD $center_1x2_chuck_0 $top_pin_1x2_hdi_launch $nominal_1x2_offset_0
+ADD $center_1x2_chuck_0 $center_1x2_chuck_0 $nominal_1x2_chuck_center
+COPY $center_1x2_chuck_0 {$center_1x2_chuck_0.x,$center_1x2_chuck_0.y,$bolt_hole_origin.z}
+SUB $center_1x2_chuck_0 $center_1x2_chuck_0 {0.000,0.000,$nominal_carrier_height}
+MOVETO $center_1x2_chuck_0 50
+VIDEO
+GETPOS $pos
+COPY $focus_1x2_chuck_0 $pos.z
+PRINT "New 1x2 assembly chuck 0 focus z = %f" $focus_1x2_chuck_0
+
+@SURVEY_1X2_CHUCK_1_Z CHOICEPOPUP $choice "Measure height of 1x2 chuck 1?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_1X2_CHUCK_2_Z $choice
+ADD $center_1x2_chuck_1 $top_pin_1x2_hdi_launch $nominal_1x2_offset_1
+ADD $center_1x2_chuck_1 $center_1x2_chuck_1 $nominal_1x2_chuck_center
+COPY $center_1x2_chuck_1 {$center_1x2_chuck_1.x,$center_1x2_chuck_1.y,$bolt_hole_origin.z}
+SUB $center_1x2_chuck_1 $center_1x2_chuck_1 {0.000,0.000,$nominal_carrier_height}
+MOVETO $center_1x2_chuck_1 50
+VIDEO
+GETPOS $pos
+COPY $focus_1x2_chuck_1 $pos.z
+PRINT "New 1x2 assembly chuck 1 focus z = %f" $focus_1x2_chuck_1
+
+@SURVEY_1X2_CHUCK_2_Z CHOICEPOPUP $choice "Measure height of 1x2 chuck 2?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_1X2_CHUCK_3_Z $choice
+ADD $center_1x2_chuck_2 $top_pin_1x2_hdi_launch $nominal_1x2_offset_2
+ADD $center_1x2_chuck_2 $center_1x2_chuck_2 $nominal_1x2_chuck_center
+COPY $center_1x2_chuck_2 {$center_1x2_chuck_2.x,$center_1x2_chuck_2.y,$bolt_hole_origin.z}
+SUB $center_1x2_chuck_2 $center_1x2_chuck_2 {0.000,0.000,$nominal_carrier_height}
+MOVETO $center_1x2_chuck_2 50
+VIDEO
+GETPOS $pos
+COPY $focus_1x2_chuck_2 $pos.z
+PRINT "New 1x2 assembly chuck 2 focus z = %f" $focus_1x2_chuck_2
+
+@SURVEY_1X2_CHUCK_3_Z CHOICEPOPUP $choice "Measure height of 1x2 chuck 3?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_1X2_CHUCK_4_Z $choice
+ADD $center_1x2_chuck_3 $top_pin_1x2_hdi_launch $nominal_1x2_offset_3
+ADD $center_1x2_chuck_3 $center_1x2_chuck_3 $nominal_1x2_chuck_center
+COPY $center_1x2_chuck_3 {$center_1x2_chuck_3.x,$center_1x2_chuck_3.y,$bolt_hole_origin.z}
+SUB $center_1x2_chuck_3 $center_1x2_chuck_3 {0.000,0.000,$nominal_carrier_height}
+MOVETO $center_1x2_chuck_3 50
+VIDEO
+GETPOS $pos
+COPY $focus_1x2_chuck_3 $pos.z
+PRINT "New 1x2 assembly chuck 3 focus z = %f" $focus_1x2_chuck_3
+
+@SURVEY_1X2_CHUCK_4_Z CHOICEPOPUP $choice "Measure height of 1x2 chuck 4?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_2X2_Z $choice
+ADD $center_1x2_chuck_4 $top_pin_1x2_hdi_launch $nominal_1x2_offset_4
+ADD $center_1x2_chuck_4 $center_1x2_chuck_4 $nominal_1x2_chuck_center
+COPY $center_1x2_chuck_4 {$center_1x2_chuck_4.x,$center_1x2_chuck_4.y,$bolt_hole_origin.z}
+SUB $center_1x2_chuck_4 $center_1x2_chuck_4 {0.000,0.000,$nominal_carrier_height}
+MOVETO $center_1x2_chuck_4 50
+VIDEO
+GETPOS $pos
+COPY $focus_1x2_chuck_4 $pos.z
+PRINT "New 1x2 assembly chuck 4 focus z = %f" $focus_1x2_chuck_4
+
+@SURVEY_2X2_Z MOVETO $top_pin_2x2_hdi_launch 100
+
+CHOICEPOPUP $choice "Measure height of 2x2 HDI launch pad surface?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_2X2_CHIP_Z $choice
+
+ADD $center_2x2_hdi_launch $top_pin_2x2_hdi_launch $nominal_2x2_chuck_center
+COPY $center_2x2_hdi_launch {$center_2x2_hdi_launch.x,$center_2x2_hdi_launch.y,$bolt_hole_origin.z}
+SUB $center_2x2_hdi_launch $center_2x2_hdi_launch {0.000,0.000,$nominal_chuck_height}
+MOVETO $center_2x2_hdi_launch 50
+VIDEO
+GETPOS $pos
+COPY $focus_2x2_hdi_launch $pos.z
+PRINT "New 2x2 HDI launch pad focus z = %f" $focus_2x2_hdi_launch
+
+@SURVEY_2X2_CHIP_Z CHOICEPOPUP $choice "Measure height of 2x2 chip launch pad surface?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_2X2_CHUCK_0_Z $choice
+ADD $center_2x2_chip_launch $top_pin_2x2_hdi_launch {-75.000,0.000,0.000}
+ADD $center_2x2_chip_launch $center_2x2_chip_launch $nominal_2x2_chuck_center
+COPY $center_2x2_chip_launch {$center_2x2_chip_launch.x,$center_2x2_chip_launch.y,$bolt_hole_origin.z}
+SUB $center_2x2_chip_launch $center_2x2_chip_launch {0.000,0.000,$nominal_chuck_height}
+MOVETO $center_2x2_chip_launch 50
+VIDEO
+GETPOS $pos
+COPY $focus_2x2_chip_launch $pos.z
+PRINT "New 2x2 chip launch pad focus z = %f" $focus_2x2_chip_launch
+
+@SURVEY_2X2_CHUCK_0_Z CHOICEPOPUP $choice "Measure height of 2x2 chuck 0?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_2X2_CHUCK_1_Z $choice
+ADD $center_2x2_chuck_0 $top_pin_2x2_hdi_launch $nominal_2x2_offset_0
+ADD $center_2x2_chuck_0 $center_2x2_chuck_0 $nominal_2x2_chuck_center
+COPY $center_2x2_chuck_0 {$center_2x2_chuck_0.x,$center_2x2_chuck_0.y,$bolt_hole_origin.z}
+SUB $center_2x2_chuck_0 $center_2x2_chuck_0 {0.000,0.000,$nominal_carrier_height}
+MOVETO $center_2x2_chuck_0 50
+VIDEO
+GETPOS $pos
+COPY $focus_2x2_chuck_0 $pos.z
+PRINT "New 2x2 assembly chuck 0 focus z = %f" $focus_2x2_chuck_0
+
+@SURVEY_2X2_CHUCK_1_Z CHOICEPOPUP $choice "Measure height of 2x2 chuck 1?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_2X2_CHUCK_2_Z $choice
+ADD $center_2x2_chuck_1 $top_pin_2x2_hdi_launch $nominal_2x2_offset_1
+ADD $center_2x2_chuck_1 $center_2x2_chuck_1 $nominal_2x2_chuck_center
+COPY $center_2x2_chuck_1 {$center_2x2_chuck_1.x,$center_2x2_chuck_1.y,$bolt_hole_origin.z}
+SUB $center_2x2_chuck_1 $center_2x2_chuck_1 {0.000,0.000,$nominal_carrier_height}
+MOVETO $center_2x2_chuck_1 50
+VIDEO
+GETPOS $pos
+COPY $focus_2x2_chuck_1 $pos.z
+PRINT "New 2x2 assembly chuck 1 focus z = %f" $focus_2x2_chuck_1
+
+@SURVEY_2X2_CHUCK_2_Z CHOICEPOPUP $choice "Measure height of 2x2 chuck 2?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_2X2_CHUCK_3_Z $choice
+ADD $center_2x2_chuck_2 $top_pin_2x2_hdi_launch $nominal_2x2_offset_2
+ADD $center_2x2_chuck_2 $center_2x2_chuck_2 $nominal_2x2_chuck_center
+COPY $center_2x2_chuck_2 {$center_2x2_chuck_2.x,$center_2x2_chuck_2.y,$bolt_hole_origin.z}
+SUB $center_2x2_chuck_2 $center_2x2_chuck_2 {0.000,0.000,$nominal_carrier_height}
+MOVETO $center_2x2_chuck_2 50
+VIDEO
+GETPOS $pos
+COPY $focus_2x2_chuck_2 $pos.z
+PRINT "New 2x2 assembly chuck 2 focus z = %f" $focus_2x2_chuck_2
+
+@SURVEY_2X2_CHUCK_3_Z CHOICEPOPUP $choice "Measure height of 2x2 chuck 3?" "Yes, continue." "No, skip."
+GOTOIFN @SURVEY_2X2_CHUCK_4_Z $choice
+ADD $center_2x2_chuck_3 $top_pin_2x2_hdi_launch $nominal_2x2_offset_3
+ADD $center_2x2_chuck_3 $center_2x2_chuck_3 $nominal_2x2_chuck_center
+COPY $center_2x2_chuck_3 {$center_2x2_chuck_3.x,$center_2x2_chuck_3.y,$bolt_hole_origin.z}
+SUB $center_2x2_chuck_3 $center_2x2_chuck_3 {0.000,0.000,$nominal_carrier_height}
+MOVETO $center_2x2_chuck_3 50
+VIDEO
+GETPOS $pos
+COPY $focus_2x2_chuck_3 $pos.z
+PRINT "New 2x2 assembly chuck 3 focus z = %f" $focus_2x2_chuck_3
+
+@SURVEY_2X2_CHUCK_4_Z CHOICEPOPUP $choice "Measure height of 2x2 chuck 4?" "Yes, continue." "No, skip."
+GOTOIFN @ABORT $choice
+ADD $center_2x2_chuck_4 $top_pin_2x2_hdi_launch $nominal_2x2_offset_4
+ADD $center_2x2_chuck_4 $center_2x2_chuck_4 $nominal_2x2_chuck_center
+COPY $center_2x2_chuck_4 {$center_2x2_chuck_4.x,$center_2x2_chuck_4.y,$bolt_hole_origin.z}
+SUB $center_2x2_chuck_4 $center_2x2_chuck_4 {0.000,0.000,$nominal_carrier_height}
+MOVETO $center_2x2_chuck_4 50
+VIDEO
+GETPOS $pos
+COPY $focus_2x2_chuck_4 $pos.z
+PRINT "New 2x2 assembly chuck 4 focus z = %f" $focus_2x2_chuck_4
+
+CHOICEPOPUP $choice "Write z focus to flex-config file?" "Yes, continue." "No, skip."
+GOTOIFN @ABORT $choice
+PRINT "Write to flex-config focus_1x2_hdi_launch = %f mm" $focus_1x2_hdi_launch
+PRINT "Write to flex-config focus_1x2_chip_launch = %f mm" $focus_1x2_chip_launch
+PRINT "Write to flex-config focus_1x2_chuck_0 = %f mm" $focus_1x2_chuck_0
+PRINT "Write to flex-config focus_1x2_chuck_1 = %f mm" $focus_1x2_chuck_1
+PRINT "Write to flex-config focus_1x2_chuck_2 = %f mm" $focus_1x2_chuck_2
+PRINT "Write to flex-config focus_1x2_chuck_3 = %f mm" $focus_1x2_chuck_3
+PRINT "Write to flex-config focus_1x2_chuck_4 = %f mm" $focus_1x2_chuck_4
+PRINT "Write to flex-config focus_2x2_hdi_launch = %f mm" $focus_2x2_hdi_launch
+PRINT "Write to flex-config focus_2x2_chip_launch = %f mm" $focus_2x2_chip_launch
+PRINT "Write to flex-config focus_2x2_chuck_0 = %f mm" $focus_2x2_chuck_0
+PRINT "Write to flex-config focus_2x2_chuck_1 = %f mm" $focus_2x2_chuck_1
+PRINT "Write to flex-config focus_2x2_chuck_2 = %f mm" $focus_2x2_chuck_2
+PRINT "Write to flex-config focus_2x2_chuck_3 = %f mm" $focus_2x2_chuck_3
+PRINT "Write to flex-config focus_2x2_chuck_4 = %f mm" $focus_2x2_chuck_4
+
+@ABORT HOME
+END
+
+@SURVEY_CIRCLE
+COPY $i 0
+@GET_POINT VIDEO
+GETPOS [$i]
+ADD $i $i 1
+CHOICEPOPUP $choice "Survey more points?" "Yes, continue." "No, fit circle."
+GOTOIF @GET_POINT $choice
+FITCIRCLE $center $radius $residual 0 $i
+
+CHOICEPOPUP $choice "Satisfactory fit?" "Yes, continue." "No, try again."
+GOTOIFN @SURVEY_CIRCLE $choice
+
+RETURN $center
+  
+

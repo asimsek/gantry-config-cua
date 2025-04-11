@@ -1,0 +1,291 @@
+#
+#  This script is to survey a 1x2 sensor module.
+#  To be used for the Spring 2025 Pre-production campaign.
+#
+#  Changes:
+#     * April 7, 2025  v1.10 - initial version
+#     * April 8, 2025  v1.11 - fixed safe_z undefined variable
+
+LOADCONFIG
+HOME
+SETLOG "LOG_Survey_1x2_sensor.txt"
+
+PRINT "Survey_1x2_sensor v1.11 running"
+
+#
+#  These are determined from the Initial_Gantry_Survey script
+#  They should be read from the flex-config file
+#
+COPY $bolt_hole_origin {-83.365090,625.414110,92.520000}
+COPY $top_pin_1x2_hdi_launch {170.018828,516.864208,64.280000}
+COPY $bottom_pin_1x2_hdi_launch {170.115321,581.965337,64.104000}
+COPY $theta_1x2_hdi_launch -0.087826
+
+COPY $focus_1x2_hdi_launch 73.470000
+COPY $focus_1x2_chip_launch 73.470000
+COPY $focus_1x2_chuck_0 67.120000
+COPY $focus_1x2_chuck_1 67.074999
+COPY $focus_1x2_chuck_2 67.090000
+COPY $focus_1x2_chuck_3 67.085000
+COPY $focus_1x2_chuck_4 67.100000
+COPY $focus_2x2_hdi_launch 73.585000
+COPY $focus_2x2_chip_launch 73.510000
+COPY $focus_2x2_chuck_0 67.110000
+COPY $focus_2x2_chuck_1 67.200001
+COPY $focus_2x2_chuck_2 67.244999
+COPY $focus_2x2_chuck_3 67.340000
+COPY $focus_2x2_chuck_4 67.440000
+
+#
+#  These are measured using the Calibrate_GHCO script
+#  This is with the white suction cups
+#
+COPY $ghco {0.836778,101.910113,-3.984000}
+
+#
+#  These are measured using the Calibrate_1x2_Chuck_Offset script
+#
+COPY $top_pin_chuck_0 {70.172980,516.674716,61.451700}
+COPY $bottom_pin_chuck_0 {70.026274,581.774845,61.966700}
+COPY $theta_chuck_0 0.216945
+
+COPY $top_pin_chuck_1 {70.862935,364.169864,61.231700}
+COPY $bottom_pin_chuck_1 {70.513124,429.214233,61.351699}
+COPY $theta_chuck_1 0.381768
+
+COPY $top_pin_chuck_2 {120.310416,364.568866,60.601700}
+COPY $bottom_pin_chuck_2 {120.562176,429.575235,61.326699}
+COPY $theta_chuck_2 -0.136973
+
+COPY $top_pin_chuck_3 {170.361105,364.136191,61.086700}
+COPY $bottom_pin_chuck_3 {170.077571,429.123616,61.226700}
+COPY $theta_chuck_3 0.334899
+
+COPY $top_pin_chuck_4 {219.921784,364.842221,61.021700}
+COPY $bottom_pin_chuck_4 {220.194073,429.836150,61.361700}
+COPY $theta_chuck_4 -0.155113
+
+#
+#  Nominal position of HDI on launch pad relative to top pin.
+#
+COPY $hdi_offset {-8.481755,32.438278,0.000000}
+COPY $hdi_angle -0.180814
+COPY $roc_thickness 0.155     # CROC v2 thickness
+COPY $hdi_thickness 0.555     # Height above assembly chuck of the HDI bond pads when sitting on the sensor
+
+COPY $bond_pad_1 {0.000000,-21.534,0.000000}
+COPY $bond_pad_2 {0.100000,-0.3,0.000000}
+COPY $bond_pad_3 {0.000000,0.3,0.000000}
+COPY $bond_pad_4 {0.100000,21.534,0.000000}
+
+COPY $safe_z 20.000
+COPY $close_z 2.000
+
+#  This determines the expected position of the chip relative to the HDI
+#  March 27, 2025 - Not finalized...  still calculating expected geometry.
+#
+COPY $wire_bond_length 2.35
+COPY $nominal_pad_1 {2.35,-0.074,0.00}
+COPY $nominal_pad_4 {2.45,0.075,0.00}
+
+SETVAC gantry_head_outer 0
+SETVAC gantry_head_inner 0
+
+@STEP_NOVAC CHOICEPOPUP $vac "Turn off vacuum on HDI pickup tool?" "Yes, continue" "No, leave it on"
+GOTOIFN @STEP_PROMPT $vac
+@STEP_WHICHVAC GETINTPOPUP $which "Which HDI pickup tool? (0-4)"
+GOTOIF @BAD_WEIGHT `$which<0`
+GOTOIF @BAD_WEIGHT `$which>4`
+PRINT "Turning off vacuum on 1x2 HDI pickup tool %d" $which
+SETVAC croc_weight_{$which} 0
+GOTO @STEP_PROMPT
+@BAD_WEIGHT CHOICEPOPUP $trash "Bad number.  Try again." "Sorry" "My bad"
+GOTO @STEP_WHICHVAC
+
+@STEP_PROMPT GETINTPOPUP $station "Which assembly chuck? (0-4)"
+GOTOIF @DISPLAY_ERROR `$station<0`
+GOTOIF @STATION_0 `$station<1`
+GOTOIF @STATION_1 `$station<2`
+GOTOIF @STATION_2 `$station<3`
+GOTOIF @STATION_3 `$station<4`
+GOTOIF @STATION_4 `$station<5`
+@DISPLAY_ERROR CHOICEPOPUP $trash "Bad number. Try again." "Sorry" "My bad"
+GOTO @STEP_PROMPT
+@STATION_0 COPY $theta_chuck $theta_chuck_0
+COPY $top_pin_chuck $top_pin_chuck_0
+COPY $focus_chuck $focus_1x2_chuck_0
+GOTO @SURVEY_PART
+
+@STATION_1 COPY $theta_chuck $theta_chuck_1
+COPY $top_pin_chuck $top_pin_chuck_1
+COPY $focus_chuck $focus_1x2_chuck_1
+GOTO @SURVEY_PART
+
+@STATION_2 COPY $theta_chuck $theta_chuck_2
+COPY $top_pin_chuck $top_pin_chuck_2
+COPY $focus_chuck $focus_1x2_chuck_2
+GOTO @SURVEY_PART
+
+@STATION_3 COPY $theta_chuck $theta_chuck_3
+COPY $top_pin_chuck $top_pin_chuck_3
+COPY $focus_chuck $focus_1x2_chuck_3
+GOTO @SURVEY_PART
+
+@STATION_4 COPY $theta_chuck $theta_chuck_4
+COPY $top_pin_chuck $top_pin_chuck_4
+COPY $focus_chuck $focus_1x2_chuck_4
+
+@SURVEY_PART PRINT "Surveying module on chuck %d" $station
+
+ADD $hdi_pad_1 $bond_pad_1 $hdi_offset
+ADD $hdi_pad_1 $hdi_pad_1 $top_pin_1x2_hdi_launch
+ADD $angle $theta_chuck $hdi_angle
+CALL @MOVEIT $hdi_pad_1 $top_pin_1x2_hdi_launch $top_pin_chuck $angle -> $find_pad_1
+COPY $find_pad_1 {$find_pad_1.x,$find_pad_1.y,$focus_chuck}
+SUB $find_pad_1 $find_pad_1 {0.000,0.000,$hdi_thickness}
+COPY $safe_pad_1 {$find_pad_1.x,$find_pad_1.y,$safe_z}
+MOVETO $safe_pad_1 100
+MOVETO $find_pad_1 10
+
+@STEP_PAD CHOICEPOPUP $choice "Survey center of HDI bond pad 1" "Yes, continue" "No, abort"
+GOTOIFN @STEP_NOVAC $choice
+
+VIDEO
+GETPOS $survey_pad_1
+
+SUB $chip_pad_1 $survey_pad_1 {$wire_bond_length,0.0,0.0}
+COPY $chip_pad_1 {$chip_pad_1.x,$chip_pad_1.y,$focus_chuck}
+SUB $chip_pad_1 $chip_pad_1 {0.000,0.000,$roc_thickness}
+MOVETO $chip_pad_1 10
+
+@STEP_PAD CHOICEPOPUP $choice "Survey center of chip bond pad 1" "Yes, continue" "No, abort"
+GOTOIFN @STEP_NOVAC $choice
+
+VIDEO
+GETPOS $survey_other_1
+
+ADD $hdi_pad_4 $bond_pad_4 $hdi_offset
+ADD $hdi_pad_4 $hdi_pad_4 $top_pin_1x2_hdi_launch
+ADD $angle $theta_chuck $hdi_angle
+CALL @MOVEIT $hdi_pad_4 $top_pin_1x2_hdi_launch $top_pin_chuck $angle -> $find_pad_4
+COPY $find_pad_4 {$find_pad_4.x,$find_pad_4.y,$focus_chuck}
+SUB $find_pad_4 $find_pad_4 {0.000,0.000,$hdi_thickness}
+COPY $safe_pad_4 {$find_pad_4.x,$find_pad_4.y,$safe_z}
+MOVETO $find_pad_4 10
+
+@STEP_PAD CHOICEPOPUP $choice "Survey center of HDI bond pad 4" "Yes, continue" "No, abort"
+GOTOIFN @STEP_NOVAC $choice
+
+VIDEO
+GETPOS $survey_pad_4
+
+SUB $chip_pad_4 $survey_pad_4 {$wire_bond_length,0.0,0.0}
+COPY $chip_pad_4 {$chip_pad_4.x,$chip_pad_4.y,$focus_chuck}
+SUB $chip_pad_4 $chip_pad_4 {0.000,0.000,$roc_thickness}
+MOVETO $chip_pad_4 10
+
+@STEP_PAD CHOICEPOPUP $choice "Survey center of chip bond pad 4" "Yes, continue" "No, abort"
+GOTOIFN @STEP_NOVAC $choice
+
+VIDEO
+GETPOS $survey_other_4
+
+COPY $avg_pad_1 $survey_pad_1
+ADD $avg_pad_4 $survey_pad_4 {-0.100,0.000,0.000}
+SUB $avg_hdi_axis $avg_pad_4 $avg_pad_1
+CALL @UNIT $avg_hdi_axis -> $hdi_u
+
+SUB $delta_pad_1 $survey_pad_1 $survey_other_1
+CALL @DOT $delta_pad_1 $hdi_u -> $slide_1
+PRINT "U1A HDI pad = %v mm" $survey_pad_1
+PRINT "   bond pad = %v mm" $survey_other_1
+PRINT "Wire bond length (U1A - top) = %f mm (%f mm nominal)" $delta_pad_1.x $nominal_pad_1.x
+PRINT "Slide = %f mm (%f mm nominal)" $slide_1 $nominal_pad_1.y
+
+SUB $delta_pad_4 $survey_pad_4 $survey_other_4
+CALL @DOT $delta_pad_4 $hdi_u -> $slide_4
+PRINT "U1B HDI pad = %v mm" $survey_pad_4
+PRINT "   bond pad = %v mm" $survey_other_4
+PRINT "Wire bond length (U1B - bottom) = %f mm (%f mm nominal)" $delta_pad_4.x $nominal_pad_4.x
+PRINT "Slide = %f mm (%f mm nominal)" $slide_4 $nominal_pad_4.y
+
+SUB $chip_u $survey_other_4 $survey_other_1
+ATAN2 $angle_hdi $hdi_u.y $hdi_u.x
+ATAN2 $angle_chip $chip_u.y $chip_u.x
+SUB $delta_angle $angle_chip $angle_hdi
+PRINT "Angular deviation (left) = %f deg" $delta_angle
+
+COPY $wire_bond_1 {$delta_pad_1.x,$slide_1,0.0}
+COPY $wire_bond_4 {$delta_pad_4.x,$slide_4,0.0}
+
+SUB $delta_slide_1 $slide_1 $nominal_pad_1.y
+SUB $delta_slide_4 $slide_4 $nominal_pad_4.y
+ADD $avg_slide $delta_slide_1 $delta_slide_4
+MUL $avg_slide $avg_slide 0.5
+SUB $delta_shimmy_1 $delta_pad_1.x $nominal_pad_1.x
+SUB $delta_shimmy_4 $delta_pad_4.x $nominal_pad_4.x
+ADD $avg_shimmy $delta_shimmy_1 $delta_shimmy_4
+MUL $avg_shimmy $avg_shimmy 0.5
+PRINT "      wire bond pad 1 = %v mm" $wire_bond_1
+PRINT "      wire bond pad 4 = %v mm" $wire_bond_4 
+PRINT "   shimmy/slide pad 1 = %f / %f mm" $delta_shimmy_1 $delta_slide_1
+PRINT "   shimmy/slide pad 4 = %f / %f mm" $delta_shimmy_4 $delta_slide_4
+PRINT "Average shimmy = %f mm" $avg_shimmy
+PRINT "Average slide = %f mm" $avg_slide
+
+@STEP_NOVAC CHOICEPOPUP $choice "Turn off chuck vacuum?" "Yes, turn it off" "No, leave it on"
+GOTOIFN @STEP_END $choice
+
+PRINT "Turning off vacuum on chuck %d" $station
+SETVAC croc_chuck_{$station}_top 0
+SETVAC croc_chuck_{$station}_bot 0
+
+@STEP_END HOME
+END
+
+@STEP_ABORT GETPOS $current_pos
+COPY $safe_z_pos {$current_pos.x,$current_pos.y,10.0}
+MOVETO $safe_z_pos 5
+SETVAC croc_weight_0 0
+SETVAC croc_launchHDI 0
+HOME
+END
+
+@ROTATE(vec,angle)
+  SIN $sinth $angle
+  COS $costh $angle
+  MUL $dxx $vec.x $costh
+  MUL $dxy $vec.y $sinth
+  MUL $dyx $vec.x $sinth
+  MUL $dyy $vec.y $costh
+  COPY $vec {$dxx,$dyy,$vec.z}
+  SUB $vec $vec {$dxy,0.0,0.0}
+  ADD $vec $vec {0.0,$dyx,0.0}
+  RETURN $vec
+
+@MOVEIT(vec,up,down,angle)
+  SUB $dx $vec $up
+  SIN $sinth $angle
+  COS $costh $angle
+  MUL $dxx $dx.x $costh
+  MUL $dxy $dx.y $sinth
+  MUL $dyx $dx.x $sinth
+  MUL $dyy $dx.y $costh
+  COPY $dy {$dxx,$dyy,0.0}
+  SUB $dy $dy {$dxy,0.0,0.0}
+  ADD $dy $dy {0.0,$dyx,0.0}
+  ADD $dy $dy $down
+  COPY $moved {$dy.x,$dy.y,$down.z}
+  RETURN $moved
+
+@UNIT(vec)
+  ABS $len $vec
+  INVERT $rlen $len
+  MUL $u $vec {$rlen,$rlen,0.0}
+  RETURN $u
+
+@DOT(vec1,vec2)
+  MUL $v12 $vec1 $vec2
+  ADD $v $v12.x $v12.y
+  RETURN $v
+  
