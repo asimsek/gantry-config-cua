@@ -16,62 +16,51 @@ PRINT "Survey_1x2_sensor v1.11 running"
 #  These are determined from the Initial_Gantry_Survey script
 #  They should be read from the flex-config file
 #
-COPY $bolt_hole_origin {-83.365090,625.414110,92.520000}
-COPY $top_pin_1x2_hdi_launch {170.018828,516.864208,64.280000}
-COPY $bottom_pin_1x2_hdi_launch {170.115321,581.965337,64.104000}
-COPY $theta_1x2_hdi_launch -0.087826
+FLEXREAD $top_pin_1x2_hdi_launch siteGeometry.top_pin_1x2_hdi_launch
 
-COPY $focus_1x2_hdi_launch 73.470000
-COPY $focus_1x2_chip_launch 73.470000
-COPY $focus_1x2_chuck_0 67.120000
-COPY $focus_1x2_chuck_1 67.074999
-COPY $focus_1x2_chuck_2 67.090000
-COPY $focus_1x2_chuck_3 67.085000
-COPY $focus_1x2_chuck_4 67.100000
-COPY $focus_2x2_hdi_launch 73.585000
-COPY $focus_2x2_chip_launch 73.510000
-COPY $focus_2x2_chuck_0 67.110000
-COPY $focus_2x2_chuck_1 67.200001
-COPY $focus_2x2_chuck_2 67.244999
-COPY $focus_2x2_chuck_3 67.340000
-COPY $focus_2x2_chuck_4 67.440000
-
-#
-#  These are measured using the Calibrate_GHCO script
-#  This is with the white suction cups
-#
-COPY $ghco {0.836778,101.910113,-3.984000}
+FLEXREAD $focus_1x2_hdi_launch siteGeometry.focus_1x2_hdi_launch 
+FLEXREAD $focus_1x2_chip_launch siteGeometry.focus_1x2_chip_launch 
+FLEXREAD $focus_1x2_chuck_0 siteGeometry.focus_1x2_chuck_0 
+FLEXREAD $focus_1x2_chuck_1 siteGeometry.focus_1x2_chuck_1 
+FLEXREAD $focus_1x2_chuck_2 siteGeometry.focus_1x2_chuck_2 
+FLEXREAD $focus_1x2_chuck_3 siteGeometry.focus_1x2_chuck_3 
+FLEXREAD $focus_1x2_chuck_4 siteGeometry.focus_1x2_chuck_4
 
 #
 #  These are measured using the Calibrate_1x2_Chuck_Offset script
 #
-COPY $top_pin_chuck_0 {70.172980,516.674716,61.451700}
-COPY $bottom_pin_chuck_0 {70.026274,581.774845,61.966700}
-COPY $theta_chuck_0 0.216945
+FLEXREAD $top_pin_chuck_0 siteGeometry.top_pin_1x2_chuck_0
+FLEXREAD $bottom_pin_chuck_0 siteGeometry.bottom_pin_1x2_chuck_0
+FLEXREAD $theta_chuck_0 siteGeometry.theta_1x2_chuck_0
 
-COPY $top_pin_chuck_1 {70.862935,364.169864,61.231700}
-COPY $bottom_pin_chuck_1 {70.513124,429.214233,61.351699}
-COPY $theta_chuck_1 0.381768
+FLEXREAD $top_pin_chuck_1 siteGeometry.top_pin_1x2_chuck_1
+FLEXREAD $bottom_pin_chuck_1 siteGeometry.bottom_pin_1x2_chuck_1
+FLEXREAD $theta_chuck_1 siteGeometry.theta_1x2_chuck_1
 
-COPY $top_pin_chuck_2 {120.310416,364.568866,60.601700}
-COPY $bottom_pin_chuck_2 {120.562176,429.575235,61.326699}
-COPY $theta_chuck_2 -0.136973
+FLEXREAD $top_pin_chuck_2 siteGeometry.top_pin_1x2_chuck_2
+FLEXREAD $bottom_pin_chuck_2 siteGeometry.bottom_pin_1x2_chuck_2
+FLEXREAD $theta_chuck_2 siteGeometry.theta_1x2_chuck_2
 
-COPY $top_pin_chuck_3 {170.361105,364.136191,61.086700}
-COPY $bottom_pin_chuck_3 {170.077571,429.123616,61.226700}
-COPY $theta_chuck_3 0.334899
+FLEXREAD $top_pin_chuck_3 siteGeometry.top_pin_1x2_chuck_3
+FLEXREAD $bottom_pin_chuck_3 siteGeometry.bottom_pin_1x2_chuck_3
+FLEXREAD $theta_chuck_3 siteGeometry.theta_1x2_chuck_3
 
-COPY $top_pin_chuck_4 {219.921784,364.842221,61.021700}
-COPY $bottom_pin_chuck_4 {220.194073,429.836150,61.361700}
-COPY $theta_chuck_4 -0.155113
+FLEXREAD $top_pin_chuck_4 siteGeometry.top_pin_1x2_chuck_4
+FLEXREAD $bottom_pin_chuck_4 siteGeometry.bottom_pin_1x2_chuck_4
+FLEXREAD $theta_chuck_4 siteGeometry.theta_1x2_chuck_4
 
 #
 #  Nominal position of HDI on launch pad relative to top pin.
 #
-COPY $hdi_offset {-8.481755,32.438278,0.000000}
-COPY $hdi_angle -0.180814
-COPY $roc_thickness 0.155     # CROC v2 thickness
-COPY $hdi_thickness 0.555     # Height above assembly chuck of the HDI bond pads when sitting on the sensor
+
+FLEXREAD $hdi_offset siteGeometry.hdi_1x2_offset
+FLEXREAD $hdi_angle siteGeometry.hdi_1x2_angle
+FLEXREAD $hdi_1x2_thickness siteGeometry.hdi_1x2_thickness            # HDI thickness
+FLEXREAD $roc_thickness siteGeometry.chip_1x2_thickness               # CROC v2 thickness
+FLEXREAD $sensor_1x2_thickness siteGeometry.sensor_1x2_thickness      # Sensor thickness
+
+ADD $total_thickness $hdi_1x2_thickness $roc_thickness
+ADD $total_thickness $total_thickness $sensor_thickness               # Height above assembly chuck of the HDI bond pads when sitting on the sensor
 
 COPY $bond_pad_1 {0.000000,-21.534,0.000000}
 COPY $bond_pad_2 {0.100000,-0.3,0.000000}
@@ -142,7 +131,7 @@ ADD $hdi_pad_1 $hdi_pad_1 $top_pin_1x2_hdi_launch
 ADD $angle $theta_chuck $hdi_angle
 CALL @MOVEIT $hdi_pad_1 $top_pin_1x2_hdi_launch $top_pin_chuck $angle -> $find_pad_1
 COPY $find_pad_1 {$find_pad_1.x,$find_pad_1.y,$focus_chuck}
-SUB $find_pad_1 $find_pad_1 {0.000,0.000,$hdi_thickness}
+SUB $find_pad_1 $find_pad_1 {0.000,0.000,$total_thickness}
 COPY $safe_pad_1 {$find_pad_1.x,$find_pad_1.y,$safe_z}
 MOVETO $safe_pad_1 100
 MOVETO $find_pad_1 10
@@ -169,7 +158,7 @@ ADD $hdi_pad_4 $hdi_pad_4 $top_pin_1x2_hdi_launch
 ADD $angle $theta_chuck $hdi_angle
 CALL @MOVEIT $hdi_pad_4 $top_pin_1x2_hdi_launch $top_pin_chuck $angle -> $find_pad_4
 COPY $find_pad_4 {$find_pad_4.x,$find_pad_4.y,$focus_chuck}
-SUB $find_pad_4 $find_pad_4 {0.000,0.000,$hdi_thickness}
+SUB $find_pad_4 $find_pad_4 {0.000,0.000,$total_thickness}
 COPY $safe_pad_4 {$find_pad_4.x,$find_pad_4.y,$safe_z}
 MOVETO $find_pad_4 10
 

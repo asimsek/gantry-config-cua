@@ -21,63 +21,54 @@ PRINT "Assemble_1x2_sensor v1.10 running..."
 #  These are determined from the Initial_Gantry_Survey script
 #  They should be read from the flex-config file
 #
-COPY $bolt_hole_origin {-83.365090,625.414110,92.520000}
-COPY $top_pin_1x2_hdi_launch {170.018828,516.864208,64.280000}
-COPY $bottom_pin_1x2_hdi_launch {170.115321,581.965337,64.104000}
-COPY $theta_1x2_hdi_launch -0.087826
+FLEXREAD $top_pin_1x2_hdi_launch siteGeometry.top_pin_1x2_hdi_launch
 
-COPY $focus_1x2_hdi_launch 73.470000
-COPY $focus_1x2_chip_launch 73.470000
-COPY $focus_1x2_chuck_0 67.120000
-COPY $focus_1x2_chuck_1 67.074999
-COPY $focus_1x2_chuck_2 67.090000
-COPY $focus_1x2_chuck_3 67.085000
-COPY $focus_1x2_chuck_4 67.100000
-COPY $focus_2x2_hdi_launch 73.585000
-COPY $focus_2x2_chip_launch 73.510000
-COPY $focus_2x2_chuck_0 67.110000
-COPY $focus_2x2_chuck_1 67.200001
-COPY $focus_2x2_chuck_2 67.244999
-COPY $focus_2x2_chuck_3 67.340000
-COPY $focus_2x2_chuck_4 67.440000
+FLEXREAD $focus_1x2_hdi_launch siteGeometry.focus_1x2_hdi_launch 
+FLEXREAD $focus_1x2_chip_launch siteGeometry.focus_1x2_chip_launch 
+FLEXREAD $focus_1x2_chuck_0 siteGeometry.focus_1x2_chuck_0 
+FLEXREAD $focus_1x2_chuck_1 siteGeometry.focus_1x2_chuck_1 
+FLEXREAD $focus_1x2_chuck_2 siteGeometry.focus_1x2_chuck_2 
+FLEXREAD $focus_1x2_chuck_3 siteGeometry.focus_1x2_chuck_3 
+FLEXREAD $focus_1x2_chuck_4 siteGeometry.focus_1x2_chuck_4
 
 #
 #  These are measured using the Calibrate_GHCO script
 #  This is with the white suction cups
 #
-COPY $ghco {0.836778,101.910113,-3.984000}
+FLEXREAD $ghco siteGeometry.initial_ghco
 
 #
 #  These are measured using the Calibrate_1x2_Chuck_Offset script
 #
-COPY $top_pin_chuck_0 {70.198446,516.675780,61.241700}
-COPY $bottom_pin_chuck_0 {70.026274,581.774845,61.966700}
-COPY $theta_chuck_0 0.216945
+FLEXREAD $top_pin_chuck_0 siteGeometry.top_pin_1x2_chuck_0
+FLEXREAD $bottom_pin_chuck_0 siteGeometry.bottom_pin_1x2_chuck_0
+FLEXREAD $theta_chuck_0 siteGeometry.theta_1x2_chuck_0
 
-COPY $top_pin_chuck_1 {70.864009,364.170926,61.039201}
-COPY $bottom_pin_chuck_1 {70.513124,429.214233,61.351699}
-COPY $theta_chuck_1 0.381768
+FLEXREAD $top_pin_chuck_1 siteGeometry.top_pin_1x2_chuck_1
+FLEXREAD $bottom_pin_chuck_1 siteGeometry.bottom_pin_1x2_chuck_1
+FLEXREAD $theta_chuck_1 siteGeometry.theta_1x2_chuck_1
 
-COPY $top_pin_chuck_2 {120.322618,364.555026,60.394200}
-COPY $bottom_pin_chuck_2 {120.562176,429.575235,61.326699}
-COPY $theta_chuck_2 -0.136973
+FLEXREAD $top_pin_chuck_2 siteGeometry.top_pin_1x2_chuck_2
+FLEXREAD $bottom_pin_chuck_2 siteGeometry.bottom_pin_1x2_chuck_2
+FLEXREAD $theta_chuck_2 siteGeometry.theta_1x2_chuck_2
 
-COPY $top_pin_chuck_3 {170.397701,364.147901,60.901700}
-COPY $bottom_pin_chuck_3 {170.077571,429.123616,61.226700}
-COPY $theta_chuck_3 0.334899
+FLEXREAD $top_pin_chuck_3 siteGeometry.top_pin_1x2_chuck_3
+FLEXREAD $bottom_pin_chuck_3 siteGeometry.bottom_pin_1x2_chuck_3
+FLEXREAD $theta_chuck_3 siteGeometry.theta_1x2_chuck_3
 
-COPY $top_pin_chuck_4 {219.931859,364.834770,60.831700}
-COPY $bottom_pin_chuck_4 {220.194073,429.836150,61.361700}
-COPY $theta_chuck_4 -0.155113
+FLEXREAD $top_pin_chuck_4 siteGeometry.top_pin_1x2_chuck_4
+FLEXREAD $bottom_pin_chuck_4 siteGeometry.bottom_pin_1x2_chuck_4
+FLEXREAD $theta_chuck_4 siteGeometry.theta_1x2_chuck_4
 
 
 #
 # Nominal position of HDI on launch pad relative to top pin
 #
-COPY $hdi_offset {-8.481755,32.438278,0.000000}
-COPY $hdi_angle -0.180814
 
-COPY $hdi_thickness 0.225
+FLEXREAD $hdi_offset siteGeometry.hdi_1x2_offset
+FLEXREAD $hdi_angle siteGeometry.hdi_1x2_angle
+
+FLEXREAD $hdi_thickness siteGeometry.hdi_1x2_thickness
 COPY $bond_pad_1 {0.000000,-21.534,0.000000}
 COPY $bond_pad_2 {0.100000,-0.3,0.000000}
 COPY $bond_pad_3 {0.000000,0.3,0.000000}
@@ -86,10 +77,10 @@ COPY $bond_pad_4 {0.100000,21.534,0.000000}
 #
 #  Nominal position of 1x2 sensor relative to top pin on HDI launch pad
 
-COPY $chip_offset {-59.041017,27.245333,0.000000}
-COPY $chip_angle 1.333430
+FLEXREAD $chip_offset siteGeometry.chip_1x2_offset
+FLEXREAD $chip_angle siteGeometry.chip_1x2_angle
 
-COPY $chip_thickness 0.135
+FLEXREAD $chip_thickness siteGeometry.chip_1x2_thickness
 COPY $chip_fid_1 {0.000000,-21.671,0.000000}
 COPY $chip_fid_2 {0.000000,-0.171,0.000000}
 COPY $chip_fid_3 {0.000000,0.171,0.000000}
@@ -109,15 +100,16 @@ SUB $offset $offset $wire_bond_length
 #  This controls the position of the chip relative to the HDI.
 #  Add the average shimmy/slide from the survey script to correct
 #
-COPY $offset_dx {$offset,0.000,0.000}
+FLEXREAD $offset_dx siteGeometry.offset_dx_1x2
+ADD $offset_dx $offset_dx {$offset,0.000000,0.000000}
 PRINT "Nominal wire bond length = %f mm" $wire_bond_length
 PRINT "Assembly placement vector = %v mm" $offset_dx
 
 #
 # this is the additional drop correction
 #
-COPY $drop_correction {0.009827,-0.008789,0.000}
-COPY $drop_rotation 0.011297
+FLEXREAD $drop_correction siteGeometry.drop_correction_1x2
+FLEXREAD $drop_rotation siteGeometry.drop_rotation_1x2
 PRINT "1x2 sensor drop correction = %v mm" $drop_correction
 PRINT "1x2 sensor drop rotation = %f deg" $drop_rotation
 

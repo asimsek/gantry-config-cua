@@ -751,6 +751,27 @@ siteGeometry.offset_dx_1x2_mockup: {0.000000,-0.013672,0.000000}
 #### 1x2 CROC Assembly
 ########################################
 
+siteGeometry.hdi_1x2_offset: {-8.079057,32.271548,0.000000}
+siteGeometry.hdi_1x2_angle: -0.173984
+
+siteGeometry.chip_1x2_offset: {-58.579509,31.316142,0.000000}
+siteGeometry.chip_1x2_angle: -0.016472
+
+siteGeometry.hdi_1x2_thickness: 0.225
+siteGeometry.chip_1x2_thickness: 0.135
+siteGeometry.sensor_1x2_thickness: 0.200
+
+siteGeometry.drop_correction_1x2: {0.003685,-0.000795,0.000000}
+siteGeometry.drop_rotation_1x2: 0.046220
+
+siteGeometry.offset_dx_1x2: {0.000000,-0.013672,0.000000}
+
+
+########################################
+#### 2x2 Mockup Assembly
+########################################
+
+
 
 ########################################
 #### 2x2 CROC Assembly
